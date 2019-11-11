@@ -19,27 +19,25 @@ function Customers(props) {
     //useEffect para consultar api cuando cargue
     useEffect( () => {
         let isSubscribed = true;
-        if(auth.token !== ''){
-            //Query a la API
-            const API = async () => {
-                try {
-                    await axios.get('/customers', {
-                        headers: {
-                            Authorization : `Bearer ${auth.token}`
-                        }
-                    }).then(bg=>isSubscribed ? save(bg.data):null);
-                } catch (error) {
-                     // Error con authorizacion
-                    if(error.response.status === 500) {
-                        props.history.push('/login');
+        if(auth.token === '') props.history.push('/login');
+
+        //Query a la API
+        const API = async () => {
+            try {
+                await axios.get('/customers', {
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
                     }
+                }).then(bg=>isSubscribed ? save(bg.data):null);
+            } catch (error) {
+                 // Error con authorizacion
+                if(error.response.status === 500) {
+                    props.history.push('/login');
                 }
             }
-            API();
-            return () => (isSubscribed = false);
-        }else{
-            props.history.push('/login');
         }
+        API();
+        return () => (isSubscribed = false);
     },[auth.token, customers, props.history]);
 
      // Si el state esta como false

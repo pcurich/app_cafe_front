@@ -90,6 +90,7 @@ function Login(props){
                             placeholder="Email para Iniciar Sesión"
                             required
                             onChange={readData}
+                            // value = "1@1.com"
                         />
                     </div>
 
@@ -101,6 +102,7 @@ function Login(props){
                             placeholder="Password para Iniciar Sesión"
                             required
                             onChange={readData}
+                            // value="Admin"
                         />
                     </div>
 

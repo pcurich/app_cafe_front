@@ -41,7 +41,8 @@ function Product({product}) {
                         <p className="nombre">{name}</p>
                         <p className="precio">S/. {price}</p>
                         {
-                            photo ? (
+                            photo ? 
+                            (
                                 <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" />
                             ) : null
                         }

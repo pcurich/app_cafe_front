@@ -11,6 +11,7 @@ import Nav from './components/layout/Nav';
 import Customers from './components/CustomerList/Default'
 import NewCustomer from './components/CustomerNew/Default'
 
+import Categories from './components/Category/CategoryList/Default'
 import Products from './components/ProductList/Default'
 import NewProduct from './components/ProductNew/Default'
 
@@ -36,6 +37,8 @@ function App(){
           <main className="caja-contenido col-9">
             <Switch>
               <Route exact path="/" component={Customers} />
+              <Route exact path="/category" component={Categories}/>
+
               <Route exact path="/customer/new" component={NewCustomer} />
               <Route exact path="/customer/edit/:id" component={NewCustomer} />
 
