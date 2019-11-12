@@ -1,11 +1,11 @@
-import React,{Fragment} from 'react'; 
+import React,{Fragment} from 'react';
 import {Link} from 'react-router-dom'
 import Swal from 'sweetalert2';
-import axios from '../../config/axios'
+import axios from '../../../config/axios'
 
 
 function Product({product}) {
-    
+
     const {_id, name, price, photo } = product
 
     const deleteProduct = id => {
@@ -41,9 +41,9 @@ function Product({product}) {
                         <p className="nombre">{name}</p>
                         <p className="precio">S/. {price}</p>
                         {
-                            photo ? 
+                            photo ?
                             (
-                                <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" />
+                                <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" height="42" width="42"  />
                             ) : null
                         }
                     </div>
@@ -53,8 +53,8 @@ function Product({product}) {
                             Editar Producto
                         </Link>
 
-                        <button 
-                            type="button" 
+                        <button
+                            type="button"
                             className="btn btn-rojo btn-eliminar"
                             onClick={()=> deleteProduct(_id)}
                         >

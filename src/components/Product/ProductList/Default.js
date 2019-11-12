@@ -1,30 +1,30 @@
 import React,{useEffect, useState, useContext, Fragment} from 'react';
-import axios from '../../config/axios';
-import {Link, withRouter} from 'react-router-dom'
-import Customer from '../CustomerBlock/Default'
-import Spinner from '../layout/Spinner';
+import axios from '../../../config/axios';
+import {Link,withRouter} from 'react-router-dom'
+
+import Product from '../ProductBlock/Default'
+import Spinner from '../../layout/Spinner';
 
 // import el Context
-import { CRMContext } from '../../context/CRMContext';
+import { CRMContext } from '../../../context/CRMContext';
 
-function Customers(props) {
-
+function Products(props) {
     //work with state
-    //customer = state, save = save state
-    const[customers, save]= useState([]);
+    //products = state, save = save state
+    const[products, save]= useState([]);
 
     // utilizar valores del context
     const [auth ] = useContext( CRMContext );
 
     //useEffect para consultar api cuando cargue
-    useEffect( () => {
+    useEffect( () =>  {
         let isSubscribed = true;
         if(auth.token === '') props.history.push('/login');
 
         //Query a la API
         const API = async () => {
             try {
-                await axios.get('/customers', {
+                await axios.get('/products', {
                     headers: {
                         Authorization : `Bearer ${auth.token}`
                     }
@@ -37,35 +37,38 @@ function Customers(props) {
             }
         }
         API();
-        return () => (isSubscribed = false);
-    },[auth.token, customers, props.history]);
+    },[auth.token, props.history]);
 
-     // Si el state esta como false
+    // Si el state esta como false
     if(!auth.auth) {
         props.history.push('/login');
     }
 
     //Spinner de carga
-    if(!customers.length) return <Spinner />
+    if(!products.length) return <Spinner />
 
     return (
         <Fragment>
-            <h2>Clientes</h2>
-            <Link to={"/customer/new"} className="btn btn-verde nvo-cliente"> <i className="fas fa-plus-circle"></i>
-                Nuevo Cliente
+            <h2>Productos</h2>
+
+            <Link to={'/product/new'} className="btn btn-verde nvo-cliente">
+                <i className="fas fa-plus-circle"></i>
+                Nuevo Producto
             </Link>
-            <ul className="listado-clientes">
+
+            <ul className="listado-productos">
             {
-                customers.map(customer=>(
-                    <Customer 
-                    key={customer._id}
-                    customer={customer}
+                products.map(product=>(
+                    <Product
+                    key={product._id}
+                    product={product}
                     />)
                 )
             }
             </ul>
-        </Fragment> 
+        </Fragment>
+
     )
 }
 
-export default withRouter(Customers);
+export default withRouter(Products);

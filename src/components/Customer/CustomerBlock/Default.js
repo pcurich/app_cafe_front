@@ -1,10 +1,10 @@
-import React,{Fragment} from 'react'; 
+import React,{Fragment} from 'react';
 import {Link} from 'react-router-dom'
 import Swal from 'sweetalert2';
-import axios from '../../config/axios'
+import axios from '../../../config/axios'
 
 function Customer({customer}) {
-    
+
     const {_id, name, last_name, company, email, phone } = customer
 
     const deleteCustomer = id => {
@@ -45,13 +45,13 @@ function Customer({customer}) {
                         <i className="fas fa-pen-alt"></i>
                         Editar Cliente
                     </Link>
-                    
+
                     <Link to={`/shoppingCart/new/${_id}`} className="btn btn-amarillo">
                         <i className="fas fa-plus"></i>
                         Nuevo Pedido
                     </Link>
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className="btn btn-rojo btn-eliminar"
                         onClick = {() => deleteCustomer(_id)}
                     >
@@ -59,9 +59,9 @@ function Customer({customer}) {
                         Eliminar Cliente
                     </button>
                 </div>
-            </li>   
+            </li>
         </Fragment>
-        
+
     )
 }
 

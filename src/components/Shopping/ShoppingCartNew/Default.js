@@ -1,5 +1,5 @@
 import React, {useState, useEffect, Fragment} from 'react';
-import axios from '../../config/axios';
+import axios from '../../../config/axios';
 import Swal from 'sweetalert2';
 import { withRouter } from 'react-router-dom';
 
@@ -41,7 +41,7 @@ function NewShpingCart(props) {
 
         // almacenar el Total
         saveTotal(newTotal);
-        
+
     }, [id, products]);
 
     const searchProduct  = async e => {
@@ -70,7 +70,7 @@ function NewShpingCart(props) {
                 text: 'No hay resultados'
             })
         }
-    } 
+    }
 
     const readSearchData = e => {
         saveSearch( e.target.value );
@@ -103,7 +103,7 @@ function NewShpingCart(props) {
         saveProducts(all);
     }
 
-    // Elimina Un producto del state 
+    // Elimina Un producto del state
     const removeProduct = id => {
         const all = products.filter(product => product.product !== id );
 
@@ -115,11 +115,11 @@ function NewShpingCart(props) {
 
         // extraer el ID
         const { id } = props.match.params;
-        
+
         // construir el objeto
         const shoppingcart = {
-            "customer" : id, 
-            "details" : products, 
+            "customer" : id,
+            "details" : products,
             "total" : total
         }
         console.log(shoppingcart);
@@ -158,14 +158,14 @@ function NewShpingCart(props) {
                 <p>Teléfono: {customer.phone}</p>
             </div>
 
-            <FormSearchProduct 
+            <FormSearchProduct
                 searchProduct={searchProduct}
                 readSearchData={readSearchData}
             />
 
             <ul className="resumen">
                 {products.map((product, index) => (
-                    <FormProduct 
+                    <FormProduct
                         key={product.product}
                         product={product}
                         decrease={decrease}

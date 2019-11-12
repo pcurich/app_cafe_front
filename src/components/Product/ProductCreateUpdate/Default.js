@@ -1,22 +1,27 @@
-import React,{Fragment, useState, useEffect} from 'react';
+import React,{Fragment, useState,useContext, useEffect} from 'react';
 import Swal from 'sweetalert2';
 import {withRouter} from 'react-router-dom';
-import axios from '../../config/axios';
+import axios from '../../../config/axios';
+
+// import el Context
+import { CRMContext } from '../../../context/CRMContext';
 
 function NewProduct(props) {
 
     //obtengo el id para saber si es un updae o un new
     const {id} = props.match.params;
+    // utilizar valores del context
+    const [auth ] = useContext( CRMContext );
 
-    //product =state, saveProduct = function to save the stata
-    const[product, saveProduct] = useState({ name:'',  price:'', photo:'' });
+    //product =state, save = function to save the stata
+    const[product, save] = useState({ name:'',  price:'', photo:'' });
 
     //fileName =state, saveFile = function to save the stata
     const[fileName, saveFile] = useState('');
 
     //leer datos del formulario
     const readInfo = e =>{
-        saveProduct({
+        save({
             //obtener una copia del state y agregar el nuevo
             ...product,
             [e.target.name]: e.target.value
@@ -45,7 +50,7 @@ function NewProduct(props) {
             )
         }
         //redirect
-        props.history.push('/');
+        props.history.push('/product');
     }
     //validate form
     const validate = ()=> {
@@ -63,13 +68,19 @@ function NewProduct(props) {
         formData.append('name',product.name);
         formData.append('price',product.price);
         formData.append('photo',fileName);
-        
+
+        console.log(formData);
+
         try {
             if(id){
                 product.photo = fileName.name;
                 //Update
                 await axios
-                .put(`/products/${id}`,formData)
+                .put(`/products/${id}`,{
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
+                    }
+                },formData)
                 .then(res => {
                     responseBG(res);
                 })
@@ -78,6 +89,7 @@ function NewProduct(props) {
                 await axios
                 .post('/products', formData, {
                     headers: {
+                        Authorization : `Bearer ${auth.token}`,
                         'Content-Type': 'multipart/form-data'
                     }
                 })
@@ -98,30 +110,42 @@ function NewProduct(props) {
 
     //useEffect, cuando el componente carga
     useEffect(()=>{
-        //Query a la API
-        const API = async () => {
-            const bg = await axios.get(`/products/${this.id}`);
-            saveProduct(bg.data);
-        }
-        API();
-    },[]);
+
+            let isSubscribed = true;
+
+            if(id){
+                //Query a la API
+                const API = async () => {
+                    if (isSubscribed) {
+                        await axios.get(`/products/${id}`,{
+                            headers: {
+                                Authorization : `Bearer ${auth.token}`
+                            }
+                        })
+                        .then(bg=>isSubscribed ? save(bg.data):null);
+                    }
+                }
+                API()
+            };
+            return () => (isSubscribed = false);
+    },[auth.token, id]);
 
     return (
         <Fragment>
         {id ? <h2>Editar Producto</h2> : <h2>Nuevo Producto</h2> }
 
             <form onSubmit={addProduct} >
-            { id ?  
-                <legend>Actualize los campos</legend> : 
+            { id ?
+                <legend>Actualize los campos</legend> :
                 <legend>Llena todos los campos</legend>
             }
 
                 <div className="campo">
                     <label>Nombre:</label>
-                    <input 
-                        type="text" 
-                        placeholder="Nombre Producto" 
-                        name="name" 
+                    <input
+                        type="text"
+                        placeholder="Nombre Producto"
+                        name="name"
                         value= {product.name}
                         onChange ={readInfo}
                     />
@@ -129,17 +153,17 @@ function NewProduct(props) {
 
                 <div className="campo">
                     <label>Precio:</label>
-                    <input 
-                        type="number" 
-                        name="price" 
-                        min="0.00" 
-                        step="0.1" 
+                    <input
+                        type="number"
+                        name="price"
+                        min="0.00"
+                        step="0.1"
                         placeholder="Precio"
                         value= {product.price}
-                        onChange ={readInfo} 
+                        onChange ={readInfo}
                     />
                 </div>
-            
+
                 <div className="campo">
                     <label>Imagen:</label>
                     {
@@ -147,17 +171,17 @@ function NewProduct(props) {
                             <img src={`${process.env.REACT_APP_BACKEND_URL}/${product.photo}`} alt="imagen" width="300" />
                         ) : null
                     }
-                    <input 
-                        type="file"  
-                        name="imagen"                         
+                    <input
+                        type="file"
+                        name="imagen"
                         onChange ={readFile}
                     />
                 </div>
 
                 <div className="enviar">
-                    <input 
-                        type="submit" 
-                        className="btn btn-azul" 
+                    <input
+                        type="submit"
+                        className="btn btn-azul"
                         value= {id ? "Guardar Cambios" :"Agregar Producto" }
                         disabled = {validate()}
                     />

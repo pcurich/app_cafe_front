@@ -14,20 +14,26 @@ function CreateUpdateCategory(props){
 
     const[category, save] = useState({
         name:'',
-        last_name:'',
-        company:'',
-        email:'',
-        phone: ''
+        photo: '',
+        grouped_products:false,
+        available:true,
+        deleted: false
     });
-    
+
     const[fileName, saveFile] = useState('');
 
     const updateState = e => {
-        save({
-            ...category,
-            [e.target.name]: e.target.value
-        })
-    }
+        if(e.target.type === 'checkbox'){
+            save({
+                ...category,
+                [e.target.name]: e.target.checked
+            })
+        }else{
+            save({
+                ...category,
+                [e.target.name]: e.target.value
+            })
+        }    }
 
     // coloca la imagen en el state
     const readFile = e =>{
@@ -58,44 +64,51 @@ function CreateUpdateCategory(props){
             )
         }
         //redirect
-        props.history.push('/');
+        props.history.push('/category');
     }
 
     //add a new category
-    const addCategory = e => {
+    const addCategory = async e => {
         e.preventDefault();
+        const headerJWT = { 'Authorization': `Bearer ${auth.token}` }
+        const headerUpload = {
+            'Authorization' : `Bearer ${auth.token}`,
+            'Content-Type': 'multipart/form-data'
+
+        }
 
         //crear un formdata
-        const formData = new FormData();
-        formData.append('name',category.name);
-        formData.append('grouped_products',category.grouped_products);
-        formData.append('available',category.available);
-        formData.append('photo',fileName);
+        let fd = new FormData();
+        // formData.append('name',category.name);
+        // formData.append('grouped_products',category.grouped_products);
+        // formData.append('available',category.available);
+        // formData.append('photo',fileName);
+
+        fd.append('name','nameq');
+        // formData.append('grouped_products','grouped_products');
+        fd.append('available','available');
+        fd.append('photo','photo');
+
+        console.log("FormData = ");
+        console.log(fd);
 
         try {
             if(id){
                 category.photo = fileName.name;
                 //Update
-                axios
-                .put(`${PATH}/${id}`,formData,{
-                    headers: {
-                        Authorization : `Bearer ${auth.token}`
-                    }
-                })
-                .then(res => {
-                    responseBG(res);
-                })
+                await axios
+                .put(`${PATH}/${id}`,fd,{ headers: headerJWT })
+                .then(res => {  responseBG(res); })
             }else{
                 //Insert
-                axios
-                .post(`${PATH}`,formData,{
-                    headers: {
-                        Authorization : `Bearer ${auth.token}`
-                    }
+                await axios({
+                    method:'post',
+                    config:headerUpload,
+                    url:`${PATH}`,
+                    data: fd
                 })
-                .then(res => {
-                    responseBG(res);
-                })
+                //.post(`${PATH}`,fd,{ headers: headerUpload })
+                .then(res => { responseBG(res); })
             }
         } catch (error) {
             //console.log(error);
@@ -106,14 +119,14 @@ function CreateUpdateCategory(props){
                 text:'Vuelva a intentarlo'
             })
         }
-        
+
     }
 
     //useEffect, cuando el componente carga
     useEffect(()=>{
         let isSubscribed = true;
-        
-        if(id){ 
+
+        if(id){
             //Query a la API
             const API = async () => {
                 if (isSubscribed) {
@@ -130,7 +143,7 @@ function CreateUpdateCategory(props){
         return () => (isSubscribed = false);
     },[auth.token, id]);
 
-    //verifica si el usuario esta autenticado o no 
+    //verifica si el usuario esta autenticado o no
     if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
         return props.history.push('/login')
     };
@@ -141,38 +154,38 @@ function CreateUpdateCategory(props){
             {id ? <h2>Editar Categoria</h2> : <h2>Nueva Categoria</h2> }
 
             <form onSubmit={addCategory} >
-            { id ?  
-                <legend>Actualize los campos</legend> : 
+            { id ?
+                <legend>Actualize los campos</legend> :
                 <legend>Llena todos los campos</legend>
             }
 
             <div className="campo">
                 <label>Título:</label>
-                <input  type="text" 
-                        placeholder="Nombre para la  Categoria" 
-                        name="name" 
-                        value= {category.name}
-                        onChange={updateState} 
-                />
-            </div> 
-
-            <div className="campo">
-                <label>Productos Agrupados?:</label>
-                <input  type="checkbox" 
-                        name="grouped_products" 
-                        value= {category.grouped_products}
+                <input  type="text"
+                        placeholder="Nombre para la  Categoria"
+                        name="name"
+                        checked= {category.name}
                         onChange={updateState}
                 />
             </div>
-            
+
+            <div className="campo">
+                <label>Productos Agrupados?:</label>
+                <input  type="checkbox"
+                        name="grouped_products"
+                        checked= {category.grouped_products}
+                        onChange={updateState}
+                />
+            </div>
+
             <div className="campo">
                 <label>Disponible?</label>
-                <input  type="checkbox" 
-                        name="available" 
+                <input  type="checkbox"
+                        name="available"
                         value= {category.available}
                         onChange={updateState}
                 />
-            </div> 
+            </div>
 
             <div className="campo">
                 <label>Imagen:</label>
@@ -181,15 +194,15 @@ function CreateUpdateCategory(props){
                         <img src={`${process.env.REACT_APP_BACKEND_URL}/${category.photo}`} alt="imagen" width="300" />
                     ) : null
                 }
-                <input 
-                    type="file"  
-                    name="imagen"                         
+                <input
+                    type="file"
+                    name="imagen"
                     onChange ={readFile}
                 />
             </div>
             <div className="enviar">
-                <input  type="submit" 
-                        className="btn btn-azul" 
+                <input  type="submit"
+                        className="btn btn-azul"
                         value= {id ? "Guardar Cambios" :"Agregar Categoria" }
                         disabled = {validate()}
                 />

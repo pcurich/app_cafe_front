@@ -1,5 +1,5 @@
 import React, {useEffect, useState, Fragment} from 'react';
-import axios from '../../config/axios';
+import axios from '../../../config/axios';
 import ShoppingCardOrder from '../ShoppingCardOrder/Default';
 
 function ShoppingCard() {
@@ -21,7 +21,7 @@ function ShoppingCard() {
 
             <ul className="listado-pedidos">
                 {ordens.map(order => (
-                    <ShoppingCardOrder 
+                    <ShoppingCardOrder
                         key={order._id}
                         order={order}
                     />
