@@ -10,6 +10,7 @@ function CreateUpdateCategory(props){
 
     const {id} = props.match.params;
     const [auth ] = useContext( CRMContext );
+    const PATH = '/categories';
 
     const[category, save] = useState({
         name:'',
@@ -18,6 +19,8 @@ function CreateUpdateCategory(props){
         email:'',
         phone: ''
     });
+    
+    const[fileName, saveFile] = useState('');
 
     const updateState = e => {
         save({
@@ -26,10 +29,16 @@ function CreateUpdateCategory(props){
         })
     }
 
+    // coloca la imagen en el state
+    const readFile = e =>{
+        saveFile(e.target.files[0]);
+        category.photo = '';
+    }
+
     //validate form
     const validate =()=> {
-        const {name,last_name,company,email,phone} = category;
-        let is_valid = !name.length || !last_name.length|| !company.length|| !email.length || !phone.length;
+        const { name } = category;
+        let is_valid = !name.length;
         return is_valid;
     }
 
@@ -39,11 +48,11 @@ function CreateUpdateCategory(props){
             Swal.fire({
                 type:'error',
                 title:'Hubo un error',
-                text:'Ese cliente ya esta registrado'
+                text:'La categoía ya esta registrada'
             })
         }else{
             Swal.fire(
-                `${id ? 'Se actualizo el cliente': 'Se agregó el cliente'}`,
+                `${id ? 'Se actualizo la categoria': 'Se agregó la categoria'}`,
                 res.data.message,
                 'success'
             )
@@ -52,33 +61,52 @@ function CreateUpdateCategory(props){
         props.history.push('/');
     }
 
-    //add a new customer
-    const addCustomer = e => {
+    //add a new category
+    const addCategory = e => {
         e.preventDefault();
 
-        if(id){
-            //Update
-            axios
-            .put(`/customers/${id}`,{
-                headers: {
-                    Authorization : `Bearer ${auth.token}`
-                }
-            },customer)
-            .then(res => {
-                responseBG(res);
-            })
-        }else{
-            //Insert
-            axios
-            .post('/customers',{
-                headers: {
-                    Authorization : `Bearer ${auth.token}`
-                }
-            }, customer)
-            .then(res => {
-                responseBG(res);
+        //crear un formdata
+        const formData = new FormData();
+        formData.append('name',category.name);
+        formData.append('grouped_products',category.grouped_products);
+        formData.append('available',category.available);
+        formData.append('photo',fileName);
+
+        try {
+            if(id){
+                category.photo = fileName.name;
+                //Update
+                axios
+                .put(`${PATH}/${id}`,formData,{
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
+                    }
+                })
+                .then(res => {
+                    responseBG(res);
+                })
+            }else{
+                //Insert
+                axios
+                .post(`${PATH}`,formData,{
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
+                    }
+                })
+                .then(res => {
+                    responseBG(res);
+                })
+            }
+        } catch (error) {
+            //console.log(error);
+            //lanzar alerta
+            Swal.fire({
+                type:'error',
+                title:'Hubo un error',
+                text:'Vuelva a intentarlo'
             })
         }
+        
     }
 
     //useEffect, cuando el componente carga
@@ -89,7 +117,7 @@ function CreateUpdateCategory(props){
             //Query a la API
             const API = async () => {
                 if (isSubscribed) {
-                    await axios.get(`/customers/${id}`,{
+                    await axios.get(`${PATH}/${id}`,{
                         headers: {
                             Authorization : `Bearer ${auth.token}`
                         }
@@ -110,71 +138,62 @@ function CreateUpdateCategory(props){
 
     return (
         <Fragment>
-            {id ? <h2>Editar Cliente</h2> : <h2>Nuevo Cliente</h2> }
+            {id ? <h2>Editar Categoria</h2> : <h2>Nueva Categoria</h2> }
 
-            <form onSubmit={addCustomer} >
-                { id ?  
-                    <legend>Actualize los campos</legend> : 
-                    <legend>Llena todos los campos</legend>
-                }
+            <form onSubmit={addCategory} >
+            { id ?  
+                <legend>Actualize los campos</legend> : 
+                <legend>Llena todos los campos</legend>
+            }
 
-                <div className="campo">
-                    <label>Nombre:</label>
-                    <input  type="text" 
-                            placeholder="Nombre Cliente" 
-                            name="name" 
-                            value= {customer.name}
-                            onChange={updateState} 
-                    />
-                </div>
+            <div className="campo">
+                <label>Título:</label>
+                <input  type="text" 
+                        placeholder="Nombre para la  Categoria" 
+                        name="name" 
+                        value= {category.name}
+                        onChange={updateState} 
+                />
+            </div> 
 
-                <div className="campo">
-                    <label>Apellido:</label>
-                    <input  type="text" 
-                            placeholder="Apellido Cliente" 
-                            name="last_name" 
-                            value= {customer.last_name}
-                            onChange={updateStete}
-                    />
-                </div>
+            <div className="campo">
+                <label>Productos Agrupados?:</label>
+                <input  type="checkbox" 
+                        name="grouped_products" 
+                        value= {category.grouped_products}
+                        onChange={updateState}
+                />
+            </div>
             
-                <div className="campo">
-                    <label>Empresa:</label>
-                    <input  type="text" 
-                            placeholder="Empresa Cliente" 
-                            name="company" 
-                            value= {customer.company}
-                            onChange={updateStete}
-                    />
-                </div>
+            <div className="campo">
+                <label>Disponible?</label>
+                <input  type="checkbox" 
+                        name="available" 
+                        value= {category.available}
+                        onChange={updateState}
+                />
+            </div> 
 
-                <div className="campo">
-                    <label>Email:</label>
-                    <input  type="email" 
-                            placeholder="Email Cliente" 
-                            name="email" 
-                            value= {customer.email}
-                            onChange={updateStete}
-                    />
-                </div>
-
-                <div className="campo">
-                    <label>Teléfono:</label>
-                    <input  type="tel" 
-                            placeholder="Teléfono Cliente" 
-                            name="phone" 
-                            value= {customer.phone}
-                            onChange={updateStete}
-                    />
-                </div>
-
-                <div className="enviar">
-                    <input  type="submit" 
-                            className="btn btn-azul" 
-                            value= {id ? "Guardar Cambios" :"Agregar Cliente" }
-                            disabled = {validate()}
-                    />
-                </div>
+            <div className="campo">
+                <label>Imagen:</label>
+                {
+                    category.photo ? (
+                        <img src={`${process.env.REACT_APP_BACKEND_URL}/${category.photo}`} alt="imagen" width="300" />
+                    ) : null
+                }
+                <input 
+                    type="file"  
+                    name="imagen"                         
+                    onChange ={readFile}
+                />
+            </div>
+            <div className="enviar">
+                <input  type="submit" 
+                        className="btn btn-azul" 
+                        value= {id ? "Guardar Cambios" :"Agregar Categoria" }
+                        disabled = {validate()}
+                />
+            </div>
 
             </form>
         </Fragment>

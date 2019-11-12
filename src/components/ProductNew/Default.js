@@ -86,7 +86,7 @@ function NewProduct(props) {
                 })
             }
         } catch (error) {
-            console.log(error);
+            //console.log(error);
             //lanzar alerta
             Swal.fire({
                 type:'error',

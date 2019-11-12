@@ -44,7 +44,7 @@ function Categories(props) {
     return (
         <Fragment>
             <h2>Categorias</h2>
-            <Link to={PATH+"/new"} className="btn btn-verde nvo-cliente"> <i className="fas fa-plus-circle"></i>
+            <Link to={"category/new"} className="btn btn-verde nvo-cliente"> <i className="fas fa-plus-circle"></i>
                 Nueva categoria
             </Link>
             <ul className="listado-categorias">

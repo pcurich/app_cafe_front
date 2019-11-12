@@ -12,6 +12,8 @@ import Customers from './components/CustomerList/Default'
 import NewCustomer from './components/CustomerNew/Default'
 
 import Categories from './components/Category/CategoryList/Default'
+import CategoryCreateUpdate from './components/Category/CategoryCreateUpdate/Default'
+
 import Products from './components/ProductList/Default'
 import NewProduct from './components/ProductNew/Default'
 
@@ -38,6 +40,7 @@ function App(){
             <Switch>
               <Route exact path="/" component={Customers} />
               <Route exact path="/category" component={Categories}/>
+              <Route exact path="/category/new" component={CategoryCreateUpdate}/>
 
               <Route exact path="/customer/new" component={NewCustomer} />
               <Route exact path="/customer/edit/:id" component={NewCustomer} />
