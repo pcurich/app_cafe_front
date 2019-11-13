@@ -43,7 +43,7 @@ function Product({product}) {
                         {
                             photo ?
                             (
-                                <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" height="42" width="42"  />
+                                <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" height="60" width="60"  />
                             ) : null
                         }
                     </div>

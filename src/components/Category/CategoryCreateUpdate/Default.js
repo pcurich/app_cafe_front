@@ -14,7 +14,7 @@ function CreateUpdateCategory(props){
 
     const[category, save] = useState({
         name:'',
-        photo: '',
+        photo: 'default.png',
         grouped_products:false,
         available:true,
         deleted: false
@@ -38,7 +38,6 @@ function CreateUpdateCategory(props){
     // coloca la imagen en el state
     const readFile = e =>{
         saveFile(e.target.files[0]);
-        category.photo = '';
     }
 
     //validate form
@@ -70,44 +69,47 @@ function CreateUpdateCategory(props){
     //add a new category
     const addCategory = async e => {
         e.preventDefault();
-        const headerJWT = { 'Authorization': `Bearer ${auth.token}` }
-        const headerUpload = {
-            'Authorization' : `Bearer ${auth.token}`,
-            'Content-Type': 'multipart/form-data'
-
+        const headerJWT = {  Authorization: `Bearer ${auth.token}` }
+        const headerUpload = { 
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${auth.token}`       
         }
 
         //crear un formdata
-        let fd = new FormData();
-        // formData.append('name',category.name);
-        // formData.append('grouped_products',category.grouped_products);
-        // formData.append('available',category.available);
-        // formData.append('photo',fileName);
+        let formData = new FormData();
+        formData.append('name',category.name);
+        formData.append('grouped_products',category.grouped_products);
+        formData.append('available',category.available);
+        formData.append('photo',fileName);
 
-        fd.append('name','nameq');
+        // formData.append('name','nameq');
         // formData.append('grouped_products','grouped_products');
-        fd.append('available','available');
-        fd.append('photo','photo');
+        // formData.append('available','available');
+        // formData.append('photo','photo');
 
         console.log("FormData = ");
-        console.log(fd);
+        console.log(formData);
 
         try {
             if(id){
                 category.photo = fileName.name;
                 //Update
                 await axios
-                .put(`${PATH}/${id}`,fd,{ headers: headerJWT })
+                .put(`${PATH}/${id}`,formData,{ headers: headerJWT })
                 .then(res => {  responseBG(res); })
             }else{
+                console.log("INSERTANDO DATA");
                 //Insert
-                await axios({
-                    method:'post',
-                    config:headerUpload,
-                    url:`${PATH}`,
-                    data: fd
-                })
-                //.post(`${PATH}`,fd,{ headers: headerUpload })
+                await axios
+                //     method:'post',
+                //     config: { 
+                //         'Content-Type': 'multipart/form-data',
+                //         Authorization : `Bearer ${auth.token}`                
+                //     },
+                //     url:`${PATH}`,
+                //     data: formData
+                // })
+                .post(`${PATH}`,formData,{ headers: headerUpload })
                 .then(res => { responseBG(res); })
             }
         } catch (error) {

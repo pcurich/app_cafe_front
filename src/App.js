@@ -23,6 +23,7 @@ import NewShoppingCart from './components/Shopping/ShoppingCartNew/Default'
 import { CRMContext, CRMProvider } from './context/CRMContext';
 
 import Login from './components/Auth/Login/Default'
+import Home from './components/Home/Default'
 
 function App(){
   // utilizar context en el componente
@@ -38,10 +39,11 @@ function App(){
 
           <main className="caja-contenido col-9">
             <Switch>
-              <Route exact path="/" component={Customers} />
+              <Route exact path="/" component={Home} />
               <Route exact path="/category" component={Categories}/>
               <Route exact path="/category/new" component={CategoryCreateUpdate}/>
 
+              <Route exact path="/customer" component={Customers} />
               <Route exact path="/customer/new" component={NewCustomer} />
               <Route exact path="/customer/edit/:id" component={NewCustomer} />
 

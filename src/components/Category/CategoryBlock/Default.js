@@ -34,7 +34,7 @@ function Category({category}) {
     }
 
     var style = {
-        "margin-right": "6px"
+        "marginRight": "6px"
     };
 
     return (
@@ -55,7 +55,7 @@ function Category({category}) {
                     {
                         photo ? 
                         (
-                            <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" />
+                            <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" height="60" width="60" />
                         ) : null
                     }
                 </div>
