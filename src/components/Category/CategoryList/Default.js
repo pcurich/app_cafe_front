@@ -13,7 +13,6 @@ function Categories(props) {
     const [auth ] = useContext( CRMContext );
 
     useEffect( () => {
-        console.log(auth.token);
         if(auth.token === '') props.history.push('/login');
 
         let isSubscribed = true;

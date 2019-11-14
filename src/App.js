@@ -44,6 +44,7 @@ function App(){
               <Route exact path="/" component={Home} />
               <Route exact path="/category" component={Categories}/>
               <Route exact path="/category/new" component={CategoryCreateUpdate}/>
+              <Route exact path="/category/edit/:id" component={CategoryCreateUpdate}/>
 
               <Route exact path="/customer" component={Customers} />
               <Route exact path="/customer/new" component={NewCustomer} />

@@ -1,4 +1,4 @@
-import React,{Fragment, useState,useContext, useEffect} from 'react';
+import React,{Fragment, useState,useContext  } from 'react';
 import Swal from 'sweetalert2';
 import {withRouter} from 'react-router-dom';
 import axios from '../../../config/axios';
@@ -70,13 +70,15 @@ function Dummy(props) {
     const formData = new FormData();
     formData.append('photo',e.target.files[0]);
 
-    await axios.post(`${PATH}`,formData,{ headers: headers }).then(res => { responseBG(res) });
+    await axios.post(`${PATH}`,formData,{ headers: headers }).then(res => {  
+      responseBG(res);
+    });
     // axios.post(`${PATH}`,json,{ headers: headers }).then(res => { responseBG(res); });
   }
 
   const responseBG = res => {
     //check for monngo errors
-    console.log(res.data);
+    console.log(res.file);
 
     if(res.data.code === 11000){
         Swal.fire({
@@ -114,7 +116,7 @@ function Dummy(props) {
     formData.forEach(function(value, key){
         object[key] = value;
     });
-    var json = JSON.stringify(object);
+    //var json = JSON.stringify(object);
 
     await axios.post(`${PATH}`,formData,{ headers: headers }).then(res => { responseBG(res); })
 

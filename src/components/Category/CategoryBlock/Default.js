@@ -4,8 +4,6 @@ import Swal from 'sweetalert2';
 import axios from '../../../config/axios'
 
 function Category({category}) {
-    
-    console.log(category);
     const {_id, name, photo, grouped_products, available } = category;
     const PATH = '/categories';
 
@@ -33,8 +31,13 @@ function Category({category}) {
         })
     }
 
-    var style = {
-        "marginRight": "6px"
+    var styleRight = {
+        "marginRight": "16px"
+    };
+
+    var styleLeft = {
+        "marginLeft": "16px",
+        "color" : `${available?'green':'red'}`
     };
 
     return (
@@ -44,26 +47,34 @@ function Category({category}) {
                     <p className="nombre">
                     {
                         grouped_products? (
-                            <i className="fas fa-circle" style={style}></i> 
+                            <i className="fas fa-circle" style={styleRight}></i> 
                         ):(
-                            <i className="far fa-circle" style={style}></i> 
+                            <i className="far fa-circle" style={styleRight}></i> 
                         )
                     }
                     {name}
+                    {
+                        available? (
+                            <i className="fas fa-circle" style={styleLeft}></i> 
+                        ):(
+                            <i className="fas fa-circle" style={styleLeft}></i> 
+                        )
+                    }
                     </p>
+
                     <p className="empresa">{available}</p> 
                     {
                         photo ? 
                         (
-                            <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" height="60" width="60" />
+                            <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" width="300" />
                         ) : null
                     }
                 </div>
                 <div className="acciones">
-                    <Link to={`${PATH}/edit/${_id}`} className="btn btn-azul">
+                    <Link to={`category/edit/${_id}`} className="btn btn-azul">
                         <i className="fas fa-pen-alt"></i>Editar Categoria
                     </Link>
-                    <Link to={`${PATH}/edit/${_id}`} className="btn btn-amarillo">
+                    <Link to={`category/edit/${_id}`} className="btn btn-amarillo">
                         <i className="fas fa-plus"></i>Agregar Producto
                     </Link>  
                     

@@ -20,7 +20,7 @@ function CreateUpdateCategory(props){
         deleted: false
     });
 
-    const[fileName, saveFile] = useState('');
+    // const[fileName, saveFile] = useState('');
 
     const updateState = e => {
         if(e.target.type === 'checkbox'){
@@ -36,8 +36,20 @@ function CreateUpdateCategory(props){
         }    }
 
     // coloca la imagen en el state
-    const readFile = e =>{
-        saveFile(e.target.files[0]);
+    const readFile = async e =>{
+        e.preventDefault();
+
+        const headers = {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${auth.token}`
+        };
+
+        const formData = new FormData();
+        formData.append('photo',e.target.files[0]);
+
+        await axios.post('/upload',formData,{ headers: headers }).then(res => {  
+            responseBG(res);
+        });
     }
 
     //validate form
@@ -49,30 +61,35 @@ function CreateUpdateCategory(props){
 
     const responseBG = res => {
         //check for monngo errors
-        if(res.data.code === 11000){
-            Swal.fire({
-                type:'error',
-                title:'Hubo un error',
-                text:'La categoía ya esta registrada'
-            })
+        if(res.status === 200){
+            if(res.data){
+                //saveFile(res.data.fileName);
+                category.photo=res.data.fileName;
+            }            
         }else{
-            Swal.fire(
-                `${id ? 'Se actualizo la categoria': 'Se agregó la categoria'}`,
-                res.data.message,
-                'success'
-            )
+            if(res.data.code === 11000){
+                Swal.fire({
+                    type:'error',
+                    title:'Hubo un error',
+                    text:'La categoía ya esta registrada'
+                })
+            }else{
+                Swal.fire(
+                    `${id ? 'Se actualizo la categoria': 'Se agregó la categoria'}`,
+                    res.data.message,
+                    'success'
+                )
+            }
         }
-        //redirect
-        props.history.push('/category');
     }
 
     //add a new category
     const addCategory = async e => {
         e.preventDefault();
-        const headerJWT = {  Authorization: `Bearer ${auth.token}` }
-        const headerUpload = { 
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${auth.token}`       
+
+        const headers = { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`       
         }
 
         //crear un formdata
@@ -80,41 +97,29 @@ function CreateUpdateCategory(props){
         formData.append('name',category.name);
         formData.append('grouped_products',category.grouped_products);
         formData.append('available',category.available);
-        formData.append('photo',fileName);
+        formData.append('photo',category.photo);
 
-        // formData.append('name','nameq');
-        // formData.append('grouped_products','grouped_products');
-        // formData.append('available','available');
-        // formData.append('photo','photo');
-
-        console.log("FormData = ");
-        console.log(formData);
+        var object = {};
+        formData.forEach(function(value, key){
+            object[key] = value;
+        });
+        var json = JSON.stringify(object);
 
         try {
             if(id){
-                category.photo = fileName.name;
                 //Update
                 await axios
-                .put(`${PATH}/${id}`,formData,{ headers: headerJWT })
+                .put(`${PATH}/${id}`,json,{ headers: headers })
                 .then(res => {  responseBG(res); })
             }else{
-                console.log("INSERTANDO DATA");
                 //Insert
-                await axios
-                //     method:'post',
-                //     config: { 
-                //         'Content-Type': 'multipart/form-data',
-                //         Authorization : `Bearer ${auth.token}`                
-                //     },
-                //     url:`${PATH}`,
-                //     data: formData
-                // })
-                .post(`${PATH}`,formData,{ headers: headerUpload })
-                .then(res => { responseBG(res); })
+                await axios.post(`${PATH}`,json,{ headers: headers })
+                .then(res => { 
+                    responseBG(res); 
+                    props.history.push('/category');
+                })
             }
-        } catch (error) {
-            //console.log(error);
-            //lanzar alerta
+        } catch (error) { 
             Swal.fire({
                 type:'error',
                 title:'Hubo un error',
@@ -137,10 +142,16 @@ function CreateUpdateCategory(props){
                             Authorization : `Bearer ${auth.token}`
                         }
                     })
-                    .then(bg=>isSubscribed ? save(bg.data):null);
+                    .then(bg=>{
+                        if(isSubscribed) {
+                            isSubscribed = false;
+                            save(bg.data) 
+                            return;
+
+                        }})
                 }
             }
-            API()
+            API(); 
         };
         return () => (isSubscribed = false);
     },[auth.token, id]);
@@ -148,8 +159,7 @@ function CreateUpdateCategory(props){
     //verifica si el usuario esta autenticado o no
     if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
         return props.history.push('/login')
-    };
-
+    }; 
 
     return (
         <Fragment>
@@ -184,7 +194,7 @@ function CreateUpdateCategory(props){
                 <label>Disponible?</label>
                 <input  type="checkbox"
                         name="available"
-                        value= {category.available}
+                        checked= {category.available}
                         onChange={updateState}
                 />
             </div>
