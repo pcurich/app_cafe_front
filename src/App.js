@@ -13,7 +13,7 @@ import NewCustomer from './components/Customer/CustomerCreateUpdate/Default'
 
 import Categories from './components/Category/CategoryList/Default'
 import CategoryCreateUpdate from './components/Category/CategoryCreateUpdate/Default'
-
+import CategoryProduct from './components/Category/CategoryProduct/Default'
 import Products from './components/Product/ProductList/Default'
 import NewProduct from './components/Product/ProductCreateUpdate/Default'
 
@@ -30,7 +30,7 @@ import Dummy from './components/Dummy/DummyPost/Default'
 function App(){
   // utilizar context en el componente
   const [ auth, saveAuth ] = useContext(CRMContext);
-
+  console.log(React.version);
   return (
     <Router>
       <Fragment>
@@ -44,6 +44,8 @@ function App(){
               <Route exact path="/" component={Home} />
               <Route exact path="/category" component={Categories}/>
               <Route exact path="/category/new" component={CategoryCreateUpdate}/>
+              <Route exact path="/category/product/:id" component={CategoryProduct}/>
+
               <Route exact path="/category/edit/:id" component={CategoryCreateUpdate}/>
 
               <Route exact path="/customer" component={Customers} />

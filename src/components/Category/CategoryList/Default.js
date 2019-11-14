@@ -13,28 +13,30 @@ function Categories(props) {
     const [auth ] = useContext( CRMContext );
 
     useEffect( () => {
-        if(auth.token === '') props.history.push('/login');
 
-        let isSubscribed = true;
+        if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+            return props.history.push('/login')
+        };
+
         const API = async () => {
-            if (isSubscribed) {
-                try {
-                    await axios.get(PATH, { 
-                        headers: { 
-                            Authorization : `Bearer ${auth.token}`
-                        }
-                    })
-                    .then(bg=>isSubscribed ? save(bg.data) : null)
-                } catch (err) {
-                    if(err.response.status === 500) {
-                        props.history.push('/login');
+            try {
+                await axios.get(PATH, {
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
                     }
+                })
+                .then(bg=> {
+                    save(bg.data)
+                })
+            } catch (err) {
+                if(err.response.status === 500) {
+                    props.history.push('/login');
                 }
             }
         }
         API();
-        return () => (isSubscribed = false);
-    },[auth.token,  props.history]);
+        return () => {};
+    },[auth.token,auth.auth, props.history]);
 
     if(!auth.auth) {
         props.history.push('/login');
@@ -49,14 +51,14 @@ function Categories(props) {
             <ul className="listado-categorias">
             {
                 categories.map(category=>(
-                    <Category 
+                    <Category
                     key={category._id}
                     category={category}
                     />)
                 )
             }
             </ul>
-        </Fragment> 
+        </Fragment>
     )
 }
 

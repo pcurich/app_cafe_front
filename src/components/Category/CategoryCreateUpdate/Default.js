@@ -10,7 +10,6 @@ function CreateUpdateCategory(props){
 
     const {id} = props.match.params;
     const [auth ] = useContext( CRMContext );
-    const PATH = '/categories';
 
     const[category, save] = useState({
         name:'',
@@ -19,8 +18,6 @@ function CreateUpdateCategory(props){
         available:true,
         deleted: false
     });
-
-    // const[fileName, saveFile] = useState('');
 
     const updateState = e => {
         if(e.target.type === 'checkbox'){
@@ -33,7 +30,8 @@ function CreateUpdateCategory(props){
                 ...category,
                 [e.target.name]: e.target.value
             })
-        }    }
+        }
+    }
 
     // coloca la imagen en el state
     const readFile = async e =>{
@@ -47,7 +45,7 @@ function CreateUpdateCategory(props){
         const formData = new FormData();
         formData.append('photo',e.target.files[0]);
 
-        await axios.post('/upload',formData,{ headers: headers }).then(res => {  
+        await axios.post('/upload',formData,{ headers: headers }).then(res => {
             responseBG(res);
         });
     }
@@ -63,9 +61,12 @@ function CreateUpdateCategory(props){
         //check for monngo errors
         if(res.status === 200){
             if(res.data){
-                //saveFile(res.data.fileName);
                 category.photo=res.data.fileName;
-            }            
+                save({
+                    ...category,
+                    'photo': category.photo
+                })
+            }
         }else{
             if(res.data.code === 11000){
                 Swal.fire({
@@ -87,12 +88,11 @@ function CreateUpdateCategory(props){
     const addCategory = async e => {
         e.preventDefault();
 
-        const headers = { 
+        const headers = {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${auth.token}`       
+            Authorization: `Bearer ${auth.token}`
         }
 
-        //crear un formdata
         let formData = new FormData();
         formData.append('name',category.name);
         formData.append('grouped_products',category.grouped_products);
@@ -108,18 +108,22 @@ function CreateUpdateCategory(props){
         try {
             if(id){
                 //Update
+                console.log(json);
                 await axios
-                .put(`${PATH}/${id}`,json,{ headers: headers })
-                .then(res => {  responseBG(res); })
+                .put(`/categories/${id}`,json,{ headers: headers })
+                .then(res => {
+                    responseBG(res);
+                    props.history.push('/category');
+                })
             }else{
                 //Insert
-                await axios.post(`${PATH}`,json,{ headers: headers })
-                .then(res => { 
-                    responseBG(res); 
+                await axios.post('/categories',json,{ headers: headers })
+                .then(res => {
+                    responseBG(res);
                     props.history.push('/category');
                 })
             }
-        } catch (error) { 
+        } catch (error) {
             Swal.fire({
                 type:'error',
                 title:'Hubo un error',
@@ -131,35 +135,27 @@ function CreateUpdateCategory(props){
 
     //useEffect, cuando el componente carga
     useEffect(()=>{
-        let isSubscribed = true;
+
+        if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+            return props.history.push('/login')
+        };
 
         if(id){
             //Query a la API
             const API = async () => {
-                if (isSubscribed) {
-                    await axios.get(`${PATH}/${id}`,{
-                        headers: {
-                            Authorization : `Bearer ${auth.token}`
-                        }
-                    })
-                    .then(bg=>{
-                        if(isSubscribed) {
-                            isSubscribed = false;
-                            save(bg.data) 
-                            return;
-
-                        }})
-                }
+                await axios.get(`/categories/${id}`,{
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
+                    }
+                })
+                .then(bg=>{
+                    save(bg.data)
+                })
             }
-            API(); 
+            API();
         };
-        return () => (isSubscribed = false);
-    },[auth.token, id]);
-
-    //verifica si el usuario esta autenticado o no
-    if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
-        return props.history.push('/login')
-    }; 
+        return () => {};
+    },[auth.token, auth.auth, id,props.history]);
 
     return (
         <Fragment>
@@ -176,7 +172,7 @@ function CreateUpdateCategory(props){
                 <input  type="text"
                         placeholder="Nombre para la  Categoria"
                         name="name"
-                        checked= {category.name}
+                        value= {category.name}
                         onChange={updateState}
                 />
             </div>
@@ -204,7 +200,7 @@ function CreateUpdateCategory(props){
                 {
                     category.photo ? (
                         <img src={`${process.env.REACT_APP_BACKEND_URL}/${category.photo}`} alt="imagen" width="300" />
-                    ) : null
+                    ) : category.photo
                 }
                 <input
                     type="file"
