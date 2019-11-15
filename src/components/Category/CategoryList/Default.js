@@ -20,7 +20,7 @@ function Categories(props) {
 
         const API = async () => {
             try {
-                await axios.get(PATH, {
+                await axios.get(PATH,{
                     headers: {
                         Authorization : `Bearer ${auth.token}`
                     }
@@ -37,10 +37,6 @@ function Categories(props) {
         API();
         return () => {};
     },[auth.token,auth.auth, props.history]);
-
-    if(!auth.auth) {
-        props.history.push('/login');
-    }
 
     return (
         <Fragment>

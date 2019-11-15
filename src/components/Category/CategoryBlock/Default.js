@@ -79,7 +79,7 @@ function Category({category}) {
                     <Link to={`category/edit/${_id}`} className="btn btn-azul">
                         <i className="fas fa-pen-alt"></i>Editar Categoria
                     </Link>
-                    <Link to={`category/product/${_id}`} className="btn btn-amarillo">
+                    <Link to={`category/product/${_id}/${name}`} className="btn btn-amarillo">
                         <i className="fas fa-plus"></i>Agregar Producto
                     </Link>
 
