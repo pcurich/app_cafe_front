@@ -8,7 +8,6 @@ function ProductSearchResult(props) {
         <li>
             <div className="texto-producto">
                 <p className="nombre">{product.name}</p>
-                <p className="precio">$ {product.price}</p>
             </div>
             <div className="acciones">
                 <div className="contenedor-cantidad">
@@ -16,11 +15,9 @@ function ProductSearchResult(props) {
                         className="fas fa-plus"
                         onClick={() => addToCategory(index) }
                     ></i>
-                    
                 </div>
             </div>
         </li>
-    )
-}
-
+        )
+}    
 export default ProductSearchResult;

@@ -14,7 +14,6 @@ function ProductSearch(props) {
                         onChange={props.readSearchData}
                     />
                 </div>
-
                 <input
                     type="submit"
                     className="btn btn-azul btn-block"
