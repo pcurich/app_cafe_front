@@ -14,7 +14,16 @@ function NewProduct(props) {
     const [auth ] = useContext( CRMContext );
 
     //product =state, save = function to save the stata
-    const[product, save] = useState({ name:'',  price:'', photo:'' });
+    const[product, save] = useState({
+        short_name:'',
+        long_name:'',
+        description:'',
+        type:'',
+        price: 0,
+        cost:0,
+        photo:'',
+        available:true
+    });
 
     //fileName =state, saveFile = function to save the stata
     const[fileName, saveFile] = useState('');
@@ -49,8 +58,6 @@ function NewProduct(props) {
                 'success'
             )
         }
-        //redirect
-        props.history.push('/product');
     }
     //validate form
     const validate = ()=> {
@@ -83,6 +90,8 @@ function NewProduct(props) {
                 },formData)
                 .then(res => {
                     responseBG(res);
+                    //redirect
+                    props.history.push('/product');
                 })
             }else{
                 //Insert
@@ -95,6 +104,8 @@ function NewProduct(props) {
                 })
                 .then(res => {
                     responseBG(res);
+                    //redirect
+                    props.history.push('/product');
                 })
             }
         } catch (error) {
