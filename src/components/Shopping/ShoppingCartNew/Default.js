@@ -49,7 +49,6 @@ function NewShpingCart(props) {
 
         // obtener los productos de la busqueda
         const bg = await axios.post(`/products/search/${search}`);
-        console.log(bg);
 
         // si no hay resultados una alerta, contrario agregarlo al state
         if(bg.data[0]) {

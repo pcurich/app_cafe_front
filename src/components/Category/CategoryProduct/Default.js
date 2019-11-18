@@ -5,41 +5,42 @@ import {Link, withRouter} from 'react-router-dom'
 
 import { CRMContext } from '../../../context/CRMContext';
 
-import Category from '../CategoryBlock/Default'
-import Product from '../../Product/ProductBlock/Default'
- 
-import FormProduct from '../../Product/ProductSearch/Default'
+import ProductSearchResult from '../../Product/ProductSearchResult/Default';
+import ProductSearch from '../../Product/ProductSearch/Default';
+import ProductInCategoryList from '../../Product/ProductInCategoryList/Default'
 
 function CategoryProduct(props) {
 
-  const {_id,category} = props.match.params;
+  const {id,category} = props.match.params;
+  console.log(props.match.params);
   const [auth ] = useContext( CRMContext );
 
   const [search, saveSearch] = useState('');
-  const [products, saveProducts] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [productsInCategory, setProductsInCategory] = useState([]);
 
   useEffect(()=>{
 
     if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
         return props.history.push('/login')
     };
-
-    // if(_id){
-    //     Query a la API
-    //     const API = async () => {
-    //         await axios.get(`/product-by-category/${_id}`,{
-    //             headers: {
-    //                 Authorization : `Bearer ${auth.token}`
-    //             }
-    //         })
-    //         .then(bg=>{
-    //           setCategory(bg.data)
-    //         })
-    //     }
-    //     API();
-    // };
+    
+    if(id){
+        //Query a la API
+        const API = async () => {
+            await axios.get(`/product-by-category/${id}`,{
+                headers: {
+                    Authorization : `Bearer ${auth.token}`
+                }
+            })
+            .then(bg=>{
+              setProductsInCategory(bg.data)
+            })
+        }
+        API();
+    };
     return () => {};
-},[auth.token, auth.auth, _id,props.history]);
+},[auth.token, auth.auth,  productsInCategory, id,props.history]);
 
 const searchProduct  = async e => {
   e.preventDefault();
@@ -50,17 +51,14 @@ const searchProduct  = async e => {
       Authorization : `Bearer ${auth.token}`
     }
   }); 
- 
-  if(bg.data[0]) {
 
-      let res = bg.data[0];
-      // agregar la llave "producto" (copia de id)
-      res.product = bg.data[0]._id;
-      res.quantity = 0;
+  if(bg.data.length>0) {
 
-      // ponerlo en el state
-      saveProducts([...products, res]);
-
+    bg.data.forEach((p,i) => {
+      let res = bg.data[i];
+      products.push(res);
+      setProducts([...products]);
+    });
   } else {
       // no hay resultados
       Swal.fire({
@@ -71,8 +69,33 @@ const searchProduct  = async e => {
   }
 }
 
+const addToCategory = async i => { 
+
+  const all = [...products];
+  await axios.post(`/product-by-category/${id}/${all[i]._id}`,null,{
+    headers: {
+      Authorization : `Bearer ${auth.token}`
+    }
+  }).then(res=>{
+    setProductsInCategory([...products,res.data]);
+  });
+  
+}
+
 const readSearchData = e => {
   saveSearch( e.target.value );
+}
+
+const removeProduct = async id => {
+
+  alert(id)
+  await axios.put(`/product-by-category/${id}`,null,{
+    headers: {
+      Authorization : `Bearer ${auth.token}`
+    }
+  }).then(res=>{
+    setProductsInCategory([...products,res.data]);
+  });
 }
 
   return (
@@ -80,21 +103,42 @@ const readSearchData = e => {
       <div>
         <h2>{`${category}`}</h2>
 
-        <FormProduct
-                    searchProduct={searchProduct}
-                    readSearchData={readSearchData}
-                /> 
+        <ProductSearch
+          searchProduct={searchProduct}
+          readSearchData={readSearchData}
+        /> 
 
-          {/* <ul className="resumen">
+          <ul className="resumen">
             {products.map((product, index) => (
-                // <FormProduct
-                //     key={product.product}
-                //     product={product} 
-                //     index={index}
-                // />
+                <ProductSearchResult
+                    key={product._id}
+                    product={product} 
+                    index={index}
+                    addToCategory = {addToCategory}
+                />
             ))}
-          </ul> */}
+          </ul>
       
+      </div>
+      <div>
+        <h2>Productos en Categoria</h2>
+        <ul className="responsive-table">
+          <li className="table-header">
+            <div className="col col-1">Producto</div>
+            <div className="col col-2">Precio</div>
+            <div className="col col-3">Quitar</div>
+          </li>
+          {
+            productsInCategory.map((product, index) => (
+              <ProductInCategoryList
+                key = {product._id}
+                product = {product}
+                removeProduct = {removeProduct}
+              >
+              </ProductInCategoryList>
+            ))
+          }
+        </ul>
       </div>
     </Fragment>
   )

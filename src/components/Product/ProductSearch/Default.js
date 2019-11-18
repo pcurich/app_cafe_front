@@ -1,19 +1,16 @@
 import React from 'react';
 
 function ProductSearch(props) {
-
-    const {product, decrease, increase, removeProduct,  index } = props;
-
     return(
             <form onSubmit={props.searchProduct}>
-                <legend>Busca un Producto</legend> 
+                <legend>Busqueda de Productos</legend> 
 
                 <div className="campo">
-                    <label>Productos:</label>
+                    <label>Nombre:</label>
                     <input 
                         type="text" 
-                        placeholder="Nombre" 
-                        name="productos" 
+                        placeholder="Nombre del producto" 
+                        name="products" 
                         onChange={props.readSearchData}
                     />
                 </div>
