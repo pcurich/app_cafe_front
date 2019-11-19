@@ -29,7 +29,7 @@ function NewProduct(props) {
     const[fileName, saveFile] = useState('');
 
     //leer datos del formulario
-    const readInfo = e =>{
+    const updateState = e =>{
         save({
             //obtener una copia del state y agregar el nuevo
             ...product,
@@ -61,8 +61,8 @@ function NewProduct(props) {
     }
     //validate form
     const validate = ()=> {
-        const {name,price} = product;
-        let is_valid = !name.length || !price;
+        const {long_name,price} = product;
+        let is_valid = !long_name.length || !price;
         return is_valid;
     }
 
@@ -152,16 +152,35 @@ function NewProduct(props) {
             }
 
                 <div className="campo">
-                    <label>Nombre:</label>
+                    <label>Nombre Largo:</label>
                     <input
                         type="text"
-                        placeholder="Nombre Producto"
-                        name="name"
-                        value= {product.name}
-                        onChange ={readInfo}
+                        placeholder="Nombre Largo"
+                        name="long_name"
+                        value= {product.long_name}
+                        onChange ={updateState}
                     />
                 </div>
-
+                <div className="campo">
+                    <label>Descripción:</label>
+                    <input
+                        type="text"
+                        placeholder="Descripción"
+                        name="description"
+                        value= {product.description}
+                        onChange ={updateState}
+                    />
+                </div>
+                <div className="campo">
+                    <label>Tipo:</label>
+                    <input
+                        type="text"
+                        placeholder="Tipo"
+                        name="type"
+                        value= {product.type}
+                        onChange ={updateState}
+                    />
+                </div> 
                 <div className="campo">
                     <label>Precio:</label>
                     <input
@@ -171,7 +190,19 @@ function NewProduct(props) {
                         step="0.1"
                         placeholder="Precio"
                         value= {product.price}
-                        onChange ={readInfo}
+                        onChange ={updateState}
+                    />
+                </div>
+                <div className="campo">
+                    <label>Precio:</label>
+                    <input
+                        type="number"
+                        name="cost"
+                        min="0.00"
+                        step="0.1"
+                        placeholder="Costo"
+                        value= {product.cost}
+                        onChange ={updateState}
                     />
                 </div>
 
@@ -184,10 +215,19 @@ function NewProduct(props) {
                     }
                     <input
                         type="file"
-                        name="imagen"
+                        name="photo"
                         onChange ={readFile}
                     />
                 </div>
+
+                <div className="campo">
+                <label>Disponible?</label>
+                <input  type="checkbox"
+                        name="available"
+                        checked= {product.available}
+                        onChange={updateState}
+                />
+            </div>
 
                 <div className="enviar">
                     <input
