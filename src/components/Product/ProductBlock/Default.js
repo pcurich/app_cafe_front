@@ -6,8 +6,12 @@ import axios from '../../../config/axios'
 
 function Product({product}) {
 
-    const {_id, name, price, photo } = product
+    const {_id, short_name,long_name, price, photo,available } = product
 
+    var styleLeft = {
+        "marginLeft": "16px",
+        "color" : `${available?'green':'red'}`
+    };
     const deleteProduct = id => {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -38,7 +42,16 @@ function Product({product}) {
         <Fragment>
             <li className="producto">
                     <div className="info-producto">
-                        <p className="nombre">{name}</p>
+                        <p className="nombre">{short_name}</p>
+                        <p className="nombre" style={{'fontSize' : '1.5rem'}}>{long_name}
+                        {
+                            available? (
+                                <i className="fas fa-circle" style={styleLeft}></i>
+                            ):(
+                                <i className="fas fa-circle" style={styleLeft}></i>
+                            )
+                        }
+                        </p>
                         <p className="precio">S/. {price}</p>
                         {
                             photo ?

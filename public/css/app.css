@@ -20,9 +20,9 @@ body {
     font-family: var(--fontTexto);
 }
 html {
-    
+
     box-sizing: border-box;
-    font-size: 62.5%; 
+    font-size: 62.5%;
 }
 *, *:before, *:after {
     box-sizing: inherit;
@@ -102,8 +102,8 @@ h2 {
 }
 .btn-eliminar {
     margin-top: 1rem;
-    font-family: "Font Awesome 5 Free", Arial, Helvetica, sans-serif; 
-    font-weight: 900; 
+    font-family: "Font Awesome 5 Free", Arial, Helvetica, sans-serif;
+    font-weight: 900;
 }
 /** GRID **/
 @media (min-width: 768px) {
@@ -175,23 +175,23 @@ h2 {
     top: 1rem;
 }
 .navegacion a.clientes::before {
-    font-family: "Font Awesome 5 Free"; 
-    font-weight: 900; 
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     content: "\f0c0";
 }
 .navegacion a.productos::before {
-    font-family: "Font Awesome 5 Free"; 
-    font-weight: 900; 
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     content: "\f468";
 }
 .navegacion a.pedidos::before {
-    font-family: "Font Awesome 5 Free"; 
-    font-weight: 900; 
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     content: "\f02d";
 }
 .navegacion a.categorias::before {
-    font-family: "Font Awesome 5 Free"; 
-    font-weight: 900; 
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     content: "\f0ce";
 }
 
@@ -229,7 +229,7 @@ h2 {
     border-bottom: 1px solid var(--grisClaro);
 }
 .cliente:last-of-type,
-.producto:last-of-type, 
+.producto:last-of-type,
 .pedido:last-of-type{
     border-bottom: 0;
 }
@@ -255,8 +255,8 @@ h2 {
         display: flex;
         flex-direction: column;
         justify-content: space-around;
-    } 
-    
+    }
+
     .pedido .acciones,
     .producto .acciones  {
         justify-content: flex-start;
@@ -273,10 +273,10 @@ h2 {
 
 @media (min-width: 768px) {
     .cliente .acciones a:last-of-type,
-    .producto .acciones a:last-of-type, 
+    .producto .acciones a:last-of-type,
     .pedido .acciones a:last-of-type {
         margin-bottom: 0;
-    } 
+    }
 }
 .cliente p,
 .producto p,
@@ -292,8 +292,8 @@ h2 {
     color: var(--azul);
 }
 .cliente .empresa,
-.categoria .nombre, 
-.pedido .nombre, 
+.categoria .nombre,
+.pedido .nombre,
 .resumen .precio{
     font-weight: 700;
     font-size: 2rem;
@@ -357,6 +357,11 @@ form .campo input:not([type="submit"]){
     flex: 1;
     border: 1px solid #e1e1e1;
 }
+form .campo select{
+    padding: 1.5rem;
+    flex: 1;
+    border: 1px solid #e1e1e1;
+}
 form .campo input[readonly] {
     background-color: #e1e1e1;
 }
@@ -373,7 +378,7 @@ form .campo input[readonly] {
     justify-content: space-around;
     padding: 2rem;
 }
-.resumen li .texto-producto, 
+.resumen li .texto-producto,
 .resumen li .acciones  {
     flex: 0 0 calc(50% - 2rem);
 }

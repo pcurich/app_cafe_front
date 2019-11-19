@@ -1,7 +1,7 @@
 import React,{useEffect, useState, useContext, Fragment} from 'react';
 import axios from '../../../config/axios';
 import Swal from 'sweetalert2';
-import {Link, withRouter} from 'react-router-dom'
+import {withRouter} from 'react-router-dom'
 
 import { CRMContext } from '../../../context/CRMContext';
 
@@ -24,7 +24,7 @@ function CategoryProduct(props) {
     if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
         return props.history.push('/login')
     };
-    
+
     if(id){
         //Query a la API
         const API = async () => {
@@ -50,7 +50,7 @@ const searchProduct  = async e => {
     headers: {
       Authorization : `Bearer ${auth.token}`
     }
-  }); 
+  });
 
   if(bg.data.length>0) {
 
@@ -69,7 +69,7 @@ const searchProduct  = async e => {
   }
 }
 
-const addToCategory = async i => { 
+const addToCategory = async i => {
 
   const all = [...products];
   await axios.post(`/product-by-category/${id}/${all[i]._id}`,null,{
@@ -79,7 +79,7 @@ const addToCategory = async i => {
   }).then(res=>{
     setProductsInCategory([...products,res.data]);
   });
-  
+
 }
 
 const readSearchData = e => {
@@ -106,19 +106,19 @@ const removeProduct = async id => {
         <ProductSearch
           searchProduct={searchProduct}
           readSearchData={readSearchData}
-        /> 
+        />
 
           <ul className="resumen">
             {products.map((product, index) => (
                 <ProductSearchResult
                     key={product._id}
-                    product={product} 
+                    product={product}
                     index={index}
                     addToCategory = {addToCategory}
                 />
             ))}
           </ul>
-      
+
       </div>
       <div>
         <h2>Productos en Categoria</h2>

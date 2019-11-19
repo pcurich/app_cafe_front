@@ -108,7 +108,6 @@ function CreateUpdateCategory(props){
         try {
             if(id){
                 //Update
-                console.log(json);
                 await axios
                 .put(`/categories/${id}`,json,{ headers: headers })
                 .then(res => {

@@ -15,102 +15,131 @@ function NewProduct(props) {
 
     //product =state, save = function to save the stata
     const[product, save] = useState({
-        short_name:'',
-        long_name:'',
-        description:'',
-        type:'',
-        price: 0,
-        cost:0,
-        photo:'',
-        available:true
+        short_name:'',  long_name:'',
+        description:'', type:'',
+        price: 0, cost:0,
+        photo: 'default.png', available:true
     });
+     // const types_id = [0,1,2]
+    const types_id = [{id:0,name:'---------'},{id:1,name:'ToSell'},{id:2,name:'Material'}]
 
-    //fileName =state, saveFile = function to save the stata
-    const[fileName, saveFile] = useState('');
-
-    //leer datos del formulario
-    const updateState = e =>{
-        save({
-            //obtener una copia del state y agregar el nuevo
-            ...product,
-            [e.target.name]: e.target.value
-        })
+    const updateState = e => {
+        console.log(e.target.value);
+        if(e.target.type === 'checkbox'){
+            save({
+                ...product,
+                [e.target.name]: e.target.checked
+            })
+        }else {
+            if(e.target.type==='select-one'){
+                save({
+                    ...product,
+                    'type': types_id[e.target.value].name
+                })
+            }else{
+                save({
+                    ...product,
+                    [e.target.name]: e.target.value
+                })
+            }
+        }
     }
 
     // coloca la imagen en el state
-    const readFile = e =>{
-        saveFile(e.target.files[0]);
-        product.photo = '';
+    const readFile = async e =>{
+        e.preventDefault();
+
+        const headers = {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${auth.token}`
+        };
+
+        const formData = new FormData();
+        formData.append('photo',e.target.files[0]);
+
+        await axios.post('/upload',formData,{ headers: headers }).then(res => {
+            responseBG(res);
+        });
+    }
+
+	//validate form
+    const validate = ()=> {
+        const {long_name,price,short_name} = product;
+        let is_valid = !long_name.length || !short_name.length || !price;
+        return is_valid;
     }
 
     const responseBG = res => {
         //check for monngo errors
-        if(res.data.code === 11000){
+		if(res.status === 200){
+            if(res.data){
+                product.photo=res.data.fileName;
+                save({
+                    ...product,
+                    'photo': product.photo
+                })
+            }
+        }else{
+			if(res.data.code === 11000){
             Swal.fire({
                 type:'error',
                 title:'Hubo un error',
                 text:'Ese producto ya esta registrado'
             })
-        }else{
-            Swal.fire(
-                `${id ? 'Se actualizo el producto': 'Se agregó el producto'}`,
-                res.data.message,
-                'success'
-            )
-        }
-    }
-    //validate form
-    const validate = ()=> {
-        const {long_name,price} = product;
-        let is_valid = !long_name.length || !price;
-        return is_valid;
+			}else{
+				Swal.fire(
+					`${id ? 'Se actualizo el producto': 'Se agregó el producto'}`,
+					res.data.message,
+					'success'
+				)
+			}
+		}
     }
 
     //add a new Product
     const addProduct = async e => {
         e.preventDefault();
-
+		const headers = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`
+        }
         //crear un formdata
         const formData = new FormData();
-        formData.append('name',product.name);
+        formData.append('short_name',product.short_name);
+        formData.append('long_name',product.long_name);
+        formData.append('description',product.description);
+        formData.append('type',product.type);
         formData.append('price',product.price);
-        formData.append('photo',fileName);
+        formData.append('cost',product.cost);
+        formData.append('photo',product.photo);
+        formData.append('available',product.available);
+        formData.append('deleted',false);
 
-        console.log(formData);
+        var object = {};
+        formData.forEach(function(value, key){
+            object[key] = value;
+        });
+        var json = JSON.stringify(object);
 
         try {
             if(id){
-                product.photo = fileName.name;
                 //Update
                 await axios
-                .put(`/products/${id}`,{
-                    headers: {
-                        Authorization : `Bearer ${auth.token}`
-                    }
-                },formData)
+                .put(`/products/${id}`,json,{ headers: headers })
                 .then(res => {
                     responseBG(res);
-                    //redirect
                     props.history.push('/product');
                 })
             }else{
                 //Insert
                 await axios
-                .post('/products', formData, {
-                    headers: {
-                        Authorization : `Bearer ${auth.token}`,
-                        'Content-Type': 'multipart/form-data'
-                    }
-                })
+                .post('/products',json,{ headers: headers })
                 .then(res => {
                     responseBG(res);
-                    //redirect
                     props.history.push('/product');
                 })
             }
         } catch (error) {
-            //console.log(error);
-            //lanzar alerta
             Swal.fire({
                 type:'error',
                 title:'Hubo un error',
@@ -122,24 +151,26 @@ function NewProduct(props) {
     //useEffect, cuando el componente carga
     useEffect(()=>{
 
-            let isSubscribed = true;
+		if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+            return props.history.push('/login')
+        };
 
-            if(id){
-                //Query a la API
-                const API = async () => {
-                    if (isSubscribed) {
-                        await axios.get(`/products/${id}`,{
-                            headers: {
-                                Authorization : `Bearer ${auth.token}`
-                            }
-                        })
-                        .then(bg=>isSubscribed ? save(bg.data):null);
-                    }
-                }
-                API()
-            };
-            return () => (isSubscribed = false);
-    },[auth.token, id]);
+		if(id){
+            //Query a la API
+            const API = async () => {
+				await axios.get(`/products/${id}`,{
+					headers: {
+						Authorization : `Bearer ${auth.token}`
+					}
+				})
+				.then(bg=> {
+                    save(bg.data);
+				});
+            }
+            API()
+        };
+        return () => {};
+    },[auth.token, auth.auth,id,props.history]);
 
     return (
         <Fragment>
@@ -152,6 +183,16 @@ function NewProduct(props) {
             }
 
                 <div className="campo">
+                    <label>Nombre Corto:</label>
+                    <input
+                        type="text"
+                        placeholder="Nombre Corto"
+                        name="short_name"
+                        value= {product.short_name}
+                        onChange ={updateState}
+                    />
+                </div>
+                <div className="campo">
                     <label>Nombre Largo:</label>
                     <input
                         type="text"
@@ -163,46 +204,48 @@ function NewProduct(props) {
                 </div>
                 <div className="campo">
                     <label>Descripción:</label>
-                    <input
+                    <textarea
                         type="text"
                         placeholder="Descripción"
                         name="description"
                         value= {product.description}
+                        cols="70"
+                        rows="20"
                         onChange ={updateState}
                     />
                 </div>
                 <div className="campo">
                     <label>Tipo:</label>
-                    <input
-                        type="text"
-                        placeholder="Tipo"
-                        name="type"
-                        value= {product.type}
-                        onChange ={updateState}
-                    />
-                </div> 
+                    <select value={product.type} onChange ={updateState}>
+                    {
+                        types_id.map( ({name}) =>
+                            <option key={name} value={name}>{name}</option>
+                        )
+                    }
+                    </select>
+                </div>
                 <div className="campo">
                     <label>Precio:</label>
                     <input
                         type="number"
                         name="price"
                         min="0.00"
-                        step="0.1"
+                        step="0.01"
                         placeholder="Precio"
-                        value= {product.price}
-                        onChange ={updateState}
+                        value={product.price}
+                        onChange={updateState}
                     />
                 </div>
                 <div className="campo">
-                    <label>Precio:</label>
+                    <label>Costo:</label>
                     <input
                         type="number"
                         name="cost"
                         min="0.00"
-                        step="0.1"
+                        step="0.01"
                         placeholder="Costo"
-                        value= {product.cost}
-                        onChange ={updateState}
+                        value={product.cost}
+                        onChange={updateState}
                     />
                 </div>
 
