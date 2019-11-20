@@ -3,7 +3,6 @@ import axios from '../../../config/axios';
 import {Link,withRouter} from 'react-router-dom'
 
 import Product from '../ProductBlock/Default'
-import Spinner from '../../layout/Spinner';
 
 // import el Context
 import { CRMContext } from '../../../context/CRMContext';
@@ -42,10 +41,7 @@ function Products(props) {
     // Si el state esta como false
     if(!auth.auth) {
         props.history.push('/login');
-    }
-
-    //Spinner de carga
-    if(!products.length) return <Spinner />
+    } 
 
     return (
         <Fragment>

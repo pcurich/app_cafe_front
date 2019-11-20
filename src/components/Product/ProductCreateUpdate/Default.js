@@ -21,7 +21,7 @@ function NewProduct(props) {
         photo: 'default.png', available:true
     });
      // const types_id = [0,1,2]
-    const types_id = [{id:0,name:'---------'},{id:1,name:'ToSell'},{id:2,name:'Material'}]
+    const types_id = [{id:'---------',name:'---------'},{id:'ToSell',name:'ToSell'},{id:'Material',name:'Material'}]
 
     const updateState = e => {
         console.log(e.target.value);
@@ -32,9 +32,10 @@ function NewProduct(props) {
             })
         }else {
             if(e.target.type==='select-one'){
+                console.log(e.target.value);
                 save({
                     ...product,
-                    'type': types_id[e.target.value].name
+                    'type': e.target.value
                 })
             }else{
                 save({
