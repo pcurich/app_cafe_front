@@ -2,6 +2,7 @@ import React from 'react';
 
 function ProductSearch(props) {
     return(
+        <div className="ficha-cliente">
             <form onSubmit={props.searchProduct}>
                 <legend>Busqueda de Productos</legend> 
 
@@ -13,14 +14,16 @@ function ProductSearch(props) {
                         name="products" 
                         onChange={props.readSearchData}
                     />
+                    <input
+                        type="submit"
+                        className="btn btn-azul"
+                        value="Buscar"
+                    />
                 </div>
-                <input
-                    type="submit"
-                    className="btn btn-azul btn-block"
-                    value="Buscar"
-                />
+                
 
             </form>
+        </div>
     )
 }
 

@@ -12,7 +12,6 @@ import ProductInCategoryList from '../../Product/ProductInCategoryList/Default'
 function CategoryProduct(props) {
 
   const {id,category} = props.match.params;
-  console.log(props.match.params);
   const [auth ] = useContext( CRMContext );
 
   const [search, saveSearch] = useState('');

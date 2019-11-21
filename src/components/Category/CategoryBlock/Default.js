@@ -1,12 +1,16 @@
-import React,{Fragment,useEffect, useState} from 'react';
+import React,{Fragment,useEffect,useContext, useState} from 'react';
 import {Link} from 'react-router-dom'
 import Swal from 'sweetalert2';
 import axios from '../../../config/axios'
+
+// import el Context
+import { CRMContext } from '../../../context/CRMContext';
 
 function Category({category}) {
     var {_id, name, photo, grouped_products, available,deleted } = category;
 
     const[showData, setShowData]= useState(false);
+    const [auth ] = useContext( CRMContext );
 
     const deleteCategory = id => {
         Swal.fire({
@@ -20,7 +24,11 @@ function Category({category}) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.value) {
-                axios.delete(`categories/${id}`)
+                axios.delete(`categories/${id}`,{
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
+                    }
+                })
                 .then(res => {
                     Swal.fire(
                         'Eliminado',

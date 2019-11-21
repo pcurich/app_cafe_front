@@ -117,6 +117,9 @@ h2 {
     .col-9 {
         flex: 1 0 calc(75% - 1rem);
     }
+    .col-10 {
+        flex: 1 0 calc(80% - 1rem);
+    }
 }
 .barra {
     background-color: var(--azul);
@@ -337,7 +340,7 @@ form legend {
     font-weight: 700;
     text-align: center;
     display: block;
-    padding: 2rem;
+    /* padding: 2rem; */
     margin-bottom: 2rem;
 }
 

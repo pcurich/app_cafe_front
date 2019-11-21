@@ -1,48 +1,71 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect,useContext, Fragment} from 'react';
 import axios from '../../../config/axios';
 import Swal from 'sweetalert2';
 import { withRouter } from 'react-router-dom';
 
+import { CRMContext } from '../../../context/CRMContext';
+
 import FormSearchProduct from './FormSearchProduct';
 import FormProduct from './FormProduct';
+
+import CustomerSearch from '../../Customer/CustomerSearch/Default'
+import CustomerSearchResult from '../../Customer/CustomerSearchResult/Default'
+
+import ShoppingButtonCategory from '../ShoppingButtonCategory/Default';
 
 function NewShpingCart(props) {
 
     // extraer ID de cliente
-    const { id } = props.match.params;
+    let { id } = props.match.params;
+    const [auth ] = useContext( CRMContext );
 
     // state
-    const [customer, saveCustomer] = useState({});
-    const [search, saveSearch] = useState('');
+    const [customer, setCustomer] = useState({});
+    const [categories, setCategories] = useState([]);
+    const [search, setSearch] = useState('');
     const [products, saveProducts] = useState([]);
     const [total, saveTotal] = useState(0);
 
     useEffect(() => {
+        
+        if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+            return props.history.push('/login')
+        };
 
-        // obtener el cliente
         const API = async () => {
-            // consultar el cliente actual
-            const bg = await axios.get(`/customers/${id}`);
-            saveCustomer(bg.data);
-        }
+            try {
+                await axios.get(`/categories/`, {
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
+                    }
+                })
+                .then( bg=>{
+                    setCategories(bg.data)
+                });
+            } catch (err) {
+                if(err.response.status === 500) {
+                    props.history.push('/login');
+                }
+            }
+            
+        } 
         API();
-        // actualizar el total a pagar
-        // si el arreglo de productos es igual 0: el total es 0
-        if(products.length === 0) {
-            saveTotal(0);
-            return;
-        }
+        return () => {};
+        // if(products.length === 0) {
+        //     saveTotal(0);
+        //     return;
+        // }
 
         // calcular el nuevo total
-        let newTotal = 0;
+        // let newTotal = 0;
 
-        // recorrer todos los productos, sus cantidades y precios
-        products.map(product => newTotal += (product.quantity * product.price)  );
+        // // recorrer todos los productos, sus cantidades y precios
+        // products.map(product => newTotal += (product.quantity * product.price)  );
 
-        // almacenar el Total
-        saveTotal(newTotal);
+        // // almacenar el Total
+        // saveTotal(newTotal);
 
-    }, [id, products]);
+    }, [id, customer, products]);
 
     const searchProduct  = async e => {
         e.preventDefault();
@@ -71,8 +94,28 @@ function NewShpingCart(props) {
         }
     }
 
+    const searchCustomer = async e =>{
+        e.preventDefault();
+        const bg = await axios.post(`/customers/search/${search}`,'',{
+            headers: {
+                Authorization : `Bearer ${auth.token}`
+            }
+        })
+
+        if(bg.data.length>0) {
+            setCustomer(bg.data[0]);
+        } else {
+              // no hay resultados
+            Swal.fire({
+                type: 'error',
+                title: 'No Resultados',
+                text: 'No hay resultados'
+            })
+        } 
+    }
+
     const readSearchData = e => {
-        saveSearch( e.target.value );
+        setSearch( e.target.value );
     }
 
     // actualizar la cantidad de productos
@@ -147,20 +190,45 @@ function NewShpingCart(props) {
         props.history.push('/shoppingCart');
     }
 
+    // Si el state esta como false
+    if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+        return props.history.push('/login')
+    };
+
     return (
         <Fragment>
             <h2>Nuevo Pedido</h2>
 
             <div className="ficha-cliente">
-                <h3>Datos de Cliente</h3>
-                <p>Nombre: {customer.name} {customer.last_name}</p>
-                <p>Teléfono: {customer.phone}</p>
+                {
+                    customer._id?
+                        <CustomerSearchResult
+                            key = {customer._id}
+                            customer = {customer}
+                        ></CustomerSearchResult>
+                    :
+                        <CustomerSearch
+                            key = {customer._id}
+                            readSearchData = {readSearchData}
+                            searchCustomer = {searchCustomer}
+                        ></CustomerSearch>
+                    
+                }
+                
             </div>
 
-            <FormSearchProduct
+            {/* <FormSearchProduct
                 searchProduct={searchProduct}
                 readSearchData={readSearchData}
-            />
+            /> */}
+            {
+                categories.map(category=>(
+                    <ShoppingButtonCategory
+                    key={category._id}
+                    category={category}
+                    />)
+                )
+            } 
 
             <ul className="resumen">
                 {products.map((product, index) => (

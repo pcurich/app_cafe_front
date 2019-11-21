@@ -39,7 +39,7 @@ function App(){
         <div className="grid contenedor contenido-principal">
           <Nav/>
 
-          <main className="caja-contenido col-9">
+          <main className="caja-contenido col-10">
             <Switch>
               <Route exact path="/" component={Home} />
               <Route exact path="/category" component={Categories}/>
@@ -57,6 +57,7 @@ function App(){
               <Route exact path="/product/edit/:id" component={NewProduct} />
 
               <Route exact path="/shoppingCart" component={ShoppingCarts} />
+              <Route exact path="/shoppingCart/new" component={NewShoppingCart} />
               <Route exact path="/shoppingCart/new/:id" component={NewShoppingCart} />
 
               <Route exact path="/login" component={Login} />
