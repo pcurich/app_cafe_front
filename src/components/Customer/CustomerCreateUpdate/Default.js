@@ -15,7 +15,7 @@ function NewCustomer(props){
     const [auth ] = useContext( CRMContext );
 
     //customer =state, save = function to save the stata
-    const[customer, save] = useState({ name:'', last_name:'', company:'', email:'', phone: '' });
+    const[customer, save] = useState({ name:'', last_name:'', company:'', email:'', phone: '',document_value:'' });
 
     const updateStete = e => {
         save({
@@ -26,8 +26,8 @@ function NewCustomer(props){
 
     //validate form
     const validate =()=> {
-        const {name,last_name,company,email,phone} = customer;
-        let is_valid = !name.length || !last_name.length|| !company.length|| !email.length || !phone.length;
+        const {name,last_name,company,email,document_value} = customer;
+        let is_valid = !name.length || !last_name.length|| !company.length|| !email.length || !document_value.length;
         return is_valid;
     }
 
@@ -46,59 +46,58 @@ function NewCustomer(props){
                 'success'
             )
         }
-        //redirect
-        props.history.push('/');
     }
 
     //add a new customer
     const addCustomer = e => {
         e.preventDefault();
+		const headers = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`
+        }
 
         if(id){
             //Update
             axios
-            .put(`/customers/${id}`,{
-                headers: {
-                    Authorization : `Bearer ${auth.token}`
-                }
-            },customer)
+            .put(`/customers/${id}`,customer,{ headers: headers })
             .then(res => {
                 responseBG(res);
+                props.history.push('/customer');
             })
         }else{
             //Insert
             axios
-            .post('/customers',{
-                headers: {
-                    Authorization : `Bearer ${auth.token}`
-                }
-            }, customer)
+            .post('/customers', customer,{ headers: headers })
             .then(res => {
                 responseBG(res);
+                props.history.push('/customer');
             })
         }
     }
 
     //useEffect, cuando el componente carga
     useEffect(()=>{
-        let isSubscribed = true;
+
+        if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+            return props.history.push('/login')
+        };
 
         if(id){
             //Query a la API
             const API = async () => {
-                if (isSubscribed) {
-                    await axios.get(`/customers/${id}`,{
-                        headers: {
-                            Authorization : `Bearer ${auth.token}`
-                        }
-                    })
-                    .then(bg=>isSubscribed ? save(bg.data):null);
-                }
+                await axios.get(`/customers/${id}`,{
+                    headers: {
+                        Authorization : `Bearer ${auth.token}`
+                    }
+                })
+                .then(bg=> {
+                    save(bg.data)
+                });
             }
             API()
         };
-        return () => (isSubscribed = false);
-    },[auth.token, id]);
+        return () => {};
+    },[auth.auth, auth.token, id, props.history]);
 
     //verifica si el usuario esta autenticado o no
     if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
@@ -115,6 +114,16 @@ function NewCustomer(props){
                     <legend>Actualize los campos</legend> :
                     <legend>Llena todos los campos</legend>
                 }
+
+                <div className="campo">
+                    <label>Dni:</label>
+                    <input  type="text"
+                            placeholder="DNI"
+                            name="document_value"
+                            value= {customer.document_value}
+                            onChange={updateStete}
+                    />
+                </div>
 
                 <div className="campo">
                     <label>Nombre:</label>

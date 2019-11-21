@@ -12,7 +12,7 @@ const Nav = () => {
             <h2>Administración</h2>
 
             <nav className="navegacion">
-                <Link to={"/"} className="clientes">Clientes</Link>
+                <Link to={"/customer"} className="clientes">Clientes</Link>
                 <Link to={"/category"} className="categorias">Categorias</Link>
                 <Link to={"/product"} className="productos">Productos</Link>
                 <Link to={"/shoppingCart"} className="pedidos">Pedidos</Link>

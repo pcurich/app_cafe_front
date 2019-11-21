@@ -10,7 +10,9 @@ function ShoppingCard() {
         const API = async () => {
             // obtener los pedidos
             const bg = await axios.get('/shoppingcart');
-            save(bg.data);
+            if(!bg.data){
+                save(bg.data);
+            };
         }
         API();
     }, []);

@@ -3,7 +3,6 @@ import axios from '../../../config/axios';
 import {Link, withRouter} from 'react-router-dom'
 
 import Customer from '../CustomerBlock/Default'
-import Spinner from '../../layout/Spinner';
 
 // import el Context
 import { CRMContext } from '../../../context/CRMContext';
@@ -20,7 +19,9 @@ function Customers(props) {
     //useEffect para consultar api cuando cargue
     useEffect( () => {
         let isSubscribed = true;
-        if(auth.token === '') props.history.push('/login');
+        if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+            return props.history.push('/login')
+        };
 
         //Query a la API
         const API = async () => {
@@ -39,15 +40,12 @@ function Customers(props) {
         }
         API();
         return () => (isSubscribed = false);
-    },[auth.token, props.history]);
+    },[auth.auth, auth.token, props.history]);
 
      // Si el state esta como false
-    if(!auth.auth) {
-        props.history.push('/login');
-    }
-
-    //Spinner de carga
-    if(!customers.length) return <Spinner />
+    if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+        return props.history.push('/login')
+    };
 
     return (
         <Fragment>

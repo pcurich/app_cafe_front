@@ -21,7 +21,11 @@ function NewProduct(props) {
         photo: 'default.png', available:true
     });
      // const types_id = [0,1,2]
-    const types_id = [{id:'---------',name:'---------'},{id:'ToSell',name:'ToSell'},{id:'Material',name:'Material'}]
+    const types_id = [
+        {id:'---------',name:'---------'},
+        {id:'ToSell',name:'ToSell'},
+        {id:'Material',name:'Material'}
+    ]
 
     const updateState = e => {
         console.log(e.target.value);
