@@ -117,9 +117,7 @@ function NewProduct(props) {
         formData.append('price',product.price);
         formData.append('cost',product.cost);
         formData.append('photo',product.photo);
-        formData.append('available',product.available);
-        formData.append('deleted',false);
-
+        formData.append('available',product.available); 
         var object = {};
         formData.forEach(function(value, key){
             object[key] = value;
