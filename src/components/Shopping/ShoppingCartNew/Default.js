@@ -8,10 +8,12 @@ import { CRMContext } from '../../../context/CRMContext';
 import FormSearchProduct from './FormSearchProduct';
 import FormProduct from './FormProduct';
 
+
 import CustomerSearch from '../../Customer/CustomerSearch/Default'
 import CustomerSearchResult from '../../Customer/CustomerSearchResult/Default'
 
 import ShoppingButtonCategory from '../ShoppingButtonCategory/Default';
+import ShoppingButtonProduct from '../ShoppingButtomProduct/Default';
 
 function NewShpingCart(props) {
 
@@ -27,14 +29,14 @@ function NewShpingCart(props) {
     const [total, saveTotal] = useState(0);
 
     useEffect(() => {
-        
+
         if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
             return props.history.push('/login')
         };
 
         const API = async () => {
             try {
-                await axios.get(`/categories/`, {
+                await axios.get('/categories',{
                     headers: {
                         Authorization : `Bearer ${auth.token}`
                     }
@@ -43,12 +45,13 @@ function NewShpingCart(props) {
                     setCategories(bg.data)
                 });
             } catch (err) {
+                console.log(err);
                 if(err.response.status === 500) {
                     props.history.push('/login');
                 }
             }
-            
-        } 
+
+        }
         API();
         return () => {};
         // if(products.length === 0) {
@@ -111,7 +114,7 @@ function NewShpingCart(props) {
                 title: 'No Resultados',
                 text: 'No hay resultados'
             })
-        } 
+        }
     }
 
     const readSearchData = e => {
@@ -150,6 +153,18 @@ function NewShpingCart(props) {
         const all = products.filter(product => product.product !== id );
 
         saveProducts(all)
+    }
+
+    const categorySelected = async categoryId =>{
+        console.log(categoryId);
+        await axios.get(`/product-by-category/${categoryId}`,{
+            headers: {
+                Authorization : `Bearer ${auth.token}`
+            }
+        })
+        .then(bg=>{
+            saveProducts(bg.data);
+        });
     }
 
     const createShoppingCart = async e => {
@@ -197,8 +212,6 @@ function NewShpingCart(props) {
 
     return (
         <Fragment>
-            <h2>Nuevo Pedido</h2>
-
             <div className="ficha-cliente">
                 {
                     customer._id?
@@ -212,37 +225,42 @@ function NewShpingCart(props) {
                             readSearchData = {readSearchData}
                             searchCustomer = {searchCustomer}
                         ></CustomerSearch>
-                    
+
                 }
-                
+
             </div>
 
-            {/* <FormSearchProduct
-                searchProduct={searchProduct}
-                readSearchData={readSearchData}
-            /> */}
-            {
-                categories.map(category=>(
-                    <ShoppingButtonCategory
-                    key={category._id}
-                    category={category}
-                    />)
-                )
-            } 
+            <div className="grid contenedor contenido-principal">
+                <aside className="sidebar col-2">
+                {
+                    categories.map(category=>(
+                        <ShoppingButtonCategory
+                        key={category._id}
+                        category={category}
+                        categorySelected = {()=>categorySelected(category._id)}
+                        />
 
-            <ul className="resumen">
-                {products.map((product, index) => (
-                    <FormProduct
-                        key={product.product}
-                        product={product}
-                        decrease={decrease}
-                        increase={increase}
-                        removeProduct={removeProduct}
-                        index={index}
-                    />
-                ))}
+                    ))
+                }
+                </aside>
 
-            </ul>
+                <main className="caja-contenido col-10" style={{"backgroundColor":"#f3f3f3"}}>
+                <ul className="resumen">
+                        {products.map((product, index) => (
+                            <ShoppingButtonProduct
+                                key={product._id}
+                                product={product}
+                                // decrease={decrease}
+                                // increase={increase}
+                                // removeProduct={removeProduct}
+                                // index={index}
+                            />
+                        ))}
+
+                    </ul>
+                </main>
+            </div>
+
             <p className="total">Total a Pagar: <span>S/. {total}</span> </p>
             { total > 0 ? (
                 <form

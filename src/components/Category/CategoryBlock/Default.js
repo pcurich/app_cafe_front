@@ -81,7 +81,7 @@ function Category({category}) {
                     </p>
 
                     <p className="empresa">{available}</p>
-                    <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" width="300" />
+                    <img src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" width="60" height="60" />
                 </div>
                 <div className="acciones">
                     <Link to={`category/edit/${_id}`} className="btn btn-azul">
