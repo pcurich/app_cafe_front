@@ -28,7 +28,6 @@ function NewProduct(props) {
     ]
 
     const updateState = e => {
-        console.log(e.target.value);
         if(e.target.type === 'checkbox'){
             save({
                 ...product,

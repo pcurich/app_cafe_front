@@ -2,7 +2,7 @@ import React, {useState, useContext} from 'react';
 import Swal from 'sweetalert2';
 import { withRouter } from 'react-router-dom';
 import axios from '../../../config/axios';
-
+import {Link} from 'react-router-dom'
 // Context
 import { CRMContext } from '../../../context/CRMContext';
 
@@ -26,8 +26,9 @@ function Login(props){
             const respuesta = await axios.post('/login', credentials);
             
             // extraer el token y colocarlo en localstorage
-            const { token } = respuesta.data;
+            const { token,user } = respuesta.data;
             localStorage.setItem('token', token);
+            localStorage.setItem('user', user._id);
 
             // colocarlo en el state
             saveAuth({
@@ -105,7 +106,11 @@ function Login(props){
                             // value="Admin"
                         />
                     </div>
-
+                    <div>
+                        <span className="btn btn-blue">
+                            <Link to="/newUser">Crear Cuenta</Link>
+                        </span>
+                    </div>
                     <input type="submit" value="Iniciar Sesión" className="btn btn-verde btn-block" />
                 </form>
             </div>

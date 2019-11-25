@@ -50,7 +50,6 @@ function NewShpingCart(props) {
                     props.history.push('/login');
                 }
             }
-
         }
         API();
         return () => {};
@@ -246,12 +245,13 @@ function NewShpingCart(props) {
 
                 <main className="caja-contenido col-10" style={{"backgroundColor":"#f3f3f3"}}>
                 <ul className="resumen">
-                        {products.map((product, index) => (
+                        {products.map((product) => (
                             <ShoppingButtonProduct
                                 key={product._id}
                                 product={product}
-                                // decrease={decrease}
-                                // increase={increase}
+                                quantity = {0}
+                                decrease={()=>decrease(product._id)}
+                                increase={()=>increase(product._id)}
                                 // removeProduct={removeProduct}
                                 // index={index}
                             />

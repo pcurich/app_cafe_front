@@ -16,7 +16,12 @@ function CategoryProduct(props) {
 
   const [search, saveSearch] = useState('');
   const [products, setProducts] = useState([]);
-  const [productsInCategory, setProductsInCategory] = useState([]);
+  const [refreshProducts, setRefreshProducts] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+
+  const readSearchData = e => {
+    saveSearch( e.target.value );
+  }
 
   useEffect(()=>{
 
@@ -32,18 +37,19 @@ function CategoryProduct(props) {
                     Authorization : `Bearer ${auth.token}`
                 }
             })
-            .then(bg=>{
-              setProductsInCategory(bg.data)
+            .then(()=>{
+              setRefreshProducts(!refreshProducts)
             })
         }
         API();
     };
     return () => {};
-},[auth.token, auth.auth,  productsInCategory, id,props.history]);
+},[auth.token, auth.auth, id, props.history, refresh]);
 
+ 
 const searchProduct  = async e => {
   e.preventDefault();
-
+  setProducts([[]])
   // obtener los productos de la busqueda
   const bg = await axios.post(`/products/search/${search}`,'',{
     headers: {
@@ -51,13 +57,16 @@ const searchProduct  = async e => {
     }
   });
 
-  if(bg.data.length>0) {
+  for (let value of Object.values(products)) {
+    products.pop(value);
+  }
 
-    bg.data.forEach((p,i) => {
-      let res = bg.data[i];
-      products.push(res);
-      setProducts([...products]);
+  if(bg.data.length>0) { 
+    bg.data.forEach(p => {
+      products.push(p);
     });
+    setProducts([...products]);
+    
   } else {
       // no hay resultados
       Swal.fire({
@@ -75,25 +84,8 @@ const addToCategory = async i => {
     headers: {
       Authorization : `Bearer ${auth.token}`
     }
-  }).then(res=>{
-    setProductsInCategory([...products,res.data]);
-  });
-
-}
-
-const readSearchData = e => {
-  saveSearch( e.target.value );
-}
-
-const removeProduct = async id => {
-
-  alert(id)
-  await axios.put(`/product-by-category/${id}`,null,{
-    headers: {
-      Authorization : `Bearer ${auth.token}`
-    }
-  }).then(res=>{
-    setProductsInCategory([...products,res.data]);
+  }).then( ()=>{
+    setRefresh(!refresh);
   });
 }
 
@@ -113,32 +105,18 @@ const removeProduct = async id => {
                     key={product._id}
                     product={product}
                     index={index}
-                    addToCategory = {addToCategory}
+                    addToCategory = {()=>addToCategory(index)}
                 />
             ))}
           </ul>
 
       </div>
-      <div>
-        <h2>Productos en Categoria</h2>
-        <ul className="responsive-table">
-          <li className="table-header">
-            <div className="col col-1">Producto</div>
-            <div className="col col-2">Precio</div>
-            <div className="col col-3">Quitar</div>
-          </li>
-          {
-            productsInCategory.map((product, index) => (
-              <ProductInCategoryList
-                key = {product._id}
-                product = {product}
-                removeProduct = {removeProduct}
-              >
-              </ProductInCategoryList>
-            ))
-          }
-        </ul>
-      </div>
+      <ProductInCategoryList
+        key = {id}
+        categoryId = {id} 
+        refreshProducts = {refreshProducts}
+      >
+      </ProductInCategoryList>
     </Fragment>
   )
 }

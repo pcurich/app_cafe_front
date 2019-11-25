@@ -105,6 +105,20 @@ h2 {
     font-family: "Font Awesome 5 Free", Arial, Helvetica, sans-serif;
     font-weight: 900;
 }
+.flexContainer{
+    color:black;
+    padding: 1em;
+    display:flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.flexItem {
+    flex-wrap:wrap;
+    flex-direction:column;
+    justify-content:space-around;
+}
+
 /** GRID **/
 @media (min-width: 768px) {
     .grid {

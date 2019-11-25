@@ -7,7 +7,7 @@ function ProductSearchResult(props) {
     return(
         <li>
             <div className="texto-producto">
-                <p className="nombre">{product.name}</p>
+                <p className="nombre">({product.short_name}) - {product.long_name}</p>
             </div>
             <div className="acciones">
                 <div className="contenedor-cantidad">

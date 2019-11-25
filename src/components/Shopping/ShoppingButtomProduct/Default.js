@@ -1,33 +1,38 @@
 import React from 'react';
 
-function ShoppingButtonProduct({product,increase,decrease,index}) {
+function ShoppingButtonProduct({product,increase,decrease,quantity}) {
 
-    const {long_name, price, photo} = product
-
-    const flexContainer = [
-      {"background-color":"salmon"},
-      {"color":"white"},
-      {"padding": "1em"},
-      {"display":"flex"}
-    ]
-    const flexItem  = [
-      {"flex-wrap":"wrap"},
-      {"flexDirection":"column"},
-      {"justifyContent":"spaceAround"}
-    ]
-
-
-
+    const {_id,long_name, price, photo} = product
+ 
     return(
-      <div className={flexContainer}>
-<div className={flexItem}>
-<img style={{"verticalAlign":"middle"}} src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" width="60" height="60" />
-</div>
-    <div className={flexItem}>{product.long_name}</div>
-    <div className={flexItem}>{product.price}</div>
-        <div className={flexItem}>+</div>
-        <div className={flexItem}><input type="Number" /></div>
-        <div className={flexItem}>-</div>
+      <div className="flexContainer">
+        <div className="flexItem">
+          <img style={{"verticalAlign":"middle"}} src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" width="60" height="60" />
+        </div>
+        <div className="flexItem">{long_name}</div>
+        <div className="flexItem">{'S/' +  price.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')} </div>
+        <div className="flexItem">
+          <i 
+            className="fas fa-minus btn btn-azul"
+            onClick={() => decrease(_id) }
+          ></i>
+        </div>
+        <div className="flexItem">{quantity}</div>
+        <div className="flexItem btn btn-azul">
+        <i 
+            className="fas fa-plus"
+            onClick={() => increase(_id) }
+          ></i>
+        </div>
+        <div>
+        <button 
+          type="button" 
+          className="btn btn-rojo"
+          // onClick={() => eliminarProductoPedido(producto._id)}
+        >
+        <i className="fas fa-minus-circle"></i>
+        </button>
+        </div>
       </div>
     )
 }

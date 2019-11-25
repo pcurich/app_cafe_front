@@ -23,6 +23,7 @@ import NewShoppingCart from './components/Shopping/ShoppingCartNew/Default'
 import { CRMContext, CRMProvider } from './context/CRMContext';
 
 import Login from './components/Auth/Login/Default'
+import CreateUser from './components/Auth/Create/Default'
 import Home from './components/Home/Default'
 
 import Dummy from './components/Dummy/DummyPost/Default'
@@ -61,6 +62,7 @@ function App(){
               <Route exact path="/shoppingCart/new/:id" component={NewShoppingCart} />
 
               <Route exact path="/login" component={Login} />
+              <Route exact path="/newUser" component={CreateUser} />
 
               <Route exact path="/dummy" component={Dummy} />
 
