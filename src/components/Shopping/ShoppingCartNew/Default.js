@@ -45,7 +45,6 @@ function NewShpingCart(props) {
                     setCategories(bg.data)
                 });
             } catch (err) {
-                console.log(err);
                 if(err.response.status === 500) {
                     props.history.push('/login');
                 }
@@ -67,7 +66,7 @@ function NewShpingCart(props) {
         // // almacenar el Total
         // saveTotal(newTotal);
 
-    }, [id, customer, products]);
+    }, [id, customer, auth.auth, auth.token, props.history]);
 
     const searchProduct  = async e => {
         e.preventDefault();
@@ -168,6 +167,14 @@ function NewShpingCart(props) {
 
     const createShoppingCart = async e => {
         e.preventDefault();
+
+        products.forEach((p,i) =>{
+            if(p.quantity > 0) {
+                console.log(i)
+                console.log(p)
+            }
+
+        })
 
         // extraer el ID
         const { id } = props.match.params;
