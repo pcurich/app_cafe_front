@@ -154,7 +154,6 @@ function NewShpingCart(props) {
     }
 
     const categorySelected = async categoryId =>{
-        console.log(categoryId);
         await axios.get(`/product-by-category/${categoryId}`,{
             headers: {
                 Authorization : `Bearer ${auth.token}`
