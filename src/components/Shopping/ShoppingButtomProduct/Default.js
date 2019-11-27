@@ -1,9 +1,23 @@
-import React from 'react';
+import React,{useState, useEffect,useContext,} from 'react';
 
 function ShoppingButtonProduct({product,increase,decrease,quantity}) {
 
     const {_id,long_name, price, photo} = product
- 
+
+    let [update, setUpdate] = useState(0);
+
+    useEffect(() => {
+
+      const API = async () => {
+        setUpdate();
+      }
+      API();
+      return () => {};
+
+  }, [update]);
+
+
+
     return(
       <div className="flexContainer">
         <div className="flexItem">
@@ -12,21 +26,21 @@ function ShoppingButtonProduct({product,increase,decrease,quantity}) {
         <div className="flexItem">{long_name}</div>
         <div className="flexItem">{'S/' +  price.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')} </div>
         <div className="flexItem">
-          <i 
+          <i
             className="fas fa-minus btn btn-azul"
-            onClick={() => decrease(_id) }
+            onClick={() => decrease(_id)}
           ></i>
         </div>
-        <div className="flexItem">{quantity}</div>
+        <div className="flexItem">{update}</div>
         <div className="flexItem btn btn-azul">
-        <i 
+        <i
             className="fas fa-plus"
             onClick={() => increase(_id) }
           ></i>
         </div>
         <div>
-        <button 
-          type="button" 
+        <button
+          type="button"
           className="btn btn-rojo"
           // onClick={() => eliminarProductoPedido(producto._id)}
         >

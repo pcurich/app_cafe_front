@@ -26,6 +26,7 @@ function NewShpingCart(props) {
     const [categories, setCategories] = useState([]);
     const [search, setSearch] = useState('');
     const [products, saveProducts] = useState([]);
+    const [shoppingCart,setShoppingCart] = useState({customer:{},details:[],total:{}});
     const [total, saveTotal] = useState(0);
 
     useEffect(() => {
@@ -105,6 +106,8 @@ function NewShpingCart(props) {
 
         if(bg.data.length>0) {
             setCustomer(bg.data[0]);
+            shoppingCart.customer = bg.data[0];
+            setShoppingCart(shoppingCart);
         } else {
               // no hay resultados
             Swal.fire({
@@ -120,36 +123,64 @@ function NewShpingCart(props) {
     }
 
     // actualizar la cantidad de productos
-    const decrease = i => {
-        // copiar el arreglo original de productos
-        const all = [...products];
+    const decrease = id => {
+        var e = false;
+        for(let i = 0 ; i< shoppingCart.details.length; i++){
+            if(shoppingCart.details[i].product===id){
+                e=true;
+                if(shoppingCart.details[i].quantity!==0){
+                    shoppingCart.details[i].quantity--;
+                }
+            }
+        }
 
-        // validar si esta en 0 no puede ir mas alla
-        if(all[i].quantity === 0) return;
-
-        // decremento
-        all[i].quantity--;
-
-        // almacenarlo en el state
-        saveProducts(all);
-
+        if(!e){
+            for (let i = 0; i < products.length; i++) {
+                if(id === products[i]._id){
+                    var data = { product: products[i]._id,quantity:0}
+                    shoppingCart.details.push(data);
+                    break;
+                }
+            }
+        }
+        quantity(id)
     }
 
-    const increase = i => {
-       // copiar el arreglo para no mutar el original
-        const all = [...products];
+    const increase = id => {
+        var e = false;
+        for(let i = 0 ; i< shoppingCart.details.length; i++){
+            if(shoppingCart.details[i].product===id){
+                e=true;
+                if(shoppingCart.details[i].quantity!==0){
+                    shoppingCart.details[i].quantity++;
+                }
+            }
+        }
 
-       // incremento
-        all[i].quantity++;
+        if(!e){
+            for (let i = 0; i < products.length; i++) {
+                if(id === products[i]._id){
+                    var data = { product: products[i]._id,quantity:1}
+                    shoppingCart.details.push(data);
+                    break;
+                }
+            }
+        }
+        quantity(id)
+    }
 
-       // almacenarlo en el state
-        saveProducts(all);
+    const quantity = id => {
+        for(let i = 0 ; i< shoppingCart.details.length; i++){
+            if(shoppingCart.details[i].product===id){
+                return shoppingCart.details[i].quantity
+            }
+        }
+        return 0;
     }
 
     // Elimina Un producto del state
     const removeProduct = id => {
         const all = products.filter(product => product.product !== id );
-
         saveProducts(all)
     }
 
@@ -161,6 +192,7 @@ function NewShpingCart(props) {
         })
         .then(bg=>{
             saveProducts(bg.data);
+            console.log(products);
         });
     }
 
@@ -172,7 +204,6 @@ function NewShpingCart(props) {
                 console.log(i)
                 console.log(p)
             }
-
         })
 
         // extraer el ID
@@ -255,7 +286,7 @@ function NewShpingCart(props) {
                             <ShoppingButtonProduct
                                 key={product._id}
                                 product={product}
-                                quantity = {0}
+                                quantity = {quantity}
                                 decrease={()=>decrease(product._id)}
                                 increase={()=>increase(product._id)}
                                 // removeProduct={removeProduct}
