@@ -1,6 +1,7 @@
 import React, {useState, useEffect,useContext, Fragment} from 'react';
 import axios from '../../../config/axios';
 import Swal from 'sweetalert2';
+import uuid from  'uuid-random';
 import { withRouter } from 'react-router-dom';
 
 import { CRMContext } from '../../../context/CRMContext';
@@ -26,7 +27,7 @@ function NewShpingCart(props) {
     const [categories, setCategories] = useState([]);
     const [search, setSearch] = useState('');
     const [products, saveProducts] = useState([]);
-    const [shoppingCart,setShoppingCart] = useState({customer:{},details:[],total:{}});
+    const [shoppingCart,setShoppingCart] = useState({id:uuid(),customer:{},details:[],total:{}});
     const [total, saveTotal] = useState(0);
 
     useEffect(() => {
@@ -44,6 +45,10 @@ function NewShpingCart(props) {
                 })
                 .then( bg=>{
                     setCategories(bg.data)
+                    localStorage.removeItem('cart');
+                    localStorage.setItem('cart', shoppingCart);
+                    console.log(localStorage.getItem('cart').customer)
+                    
                 });
             } catch (err) {
                 if(err.response.status === 500) {
@@ -108,6 +113,8 @@ function NewShpingCart(props) {
             setCustomer(bg.data[0]);
             shoppingCart.customer = bg.data[0];
             setShoppingCart(shoppingCart);
+            localStorage.setItem('cart',shoppingCart)
+            console.log(localStorage.getItem('cart').customer)
         } else {
               // no hay resultados
             Swal.fire({
