@@ -2,6 +2,7 @@ import React, {useState, useEffect,useContext, Fragment} from 'react';
 import axios from '../../../config/axios';
 import Swal from 'sweetalert2';
 import uuid from  'uuid-random';
+
 import { withRouter } from 'react-router-dom';
 
 import { CRMContext } from '../../../context/CRMContext';
@@ -48,7 +49,7 @@ function NewShpingCart(props) {
                     localStorage.removeItem('cart');
                     localStorage.setItem('cart', shoppingCart);
                     console.log(localStorage.getItem('cart').customer)
-                    
+
                 });
             } catch (err) {
                 if(err.response.status === 500) {
@@ -293,9 +294,6 @@ function NewShpingCart(props) {
                             <ShoppingButtonProduct
                                 key={product._id}
                                 product={product}
-                                quantity = {quantity}
-                                decrease={()=>decrease(product._id)}
-                                increase={()=>increase(product._id)}
                                 // removeProduct={removeProduct}
                                 // index={index}
                             />

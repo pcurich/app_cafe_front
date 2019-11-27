@@ -1,22 +1,34 @@
-import React,{useState, useEffect,useContext,} from 'react';
+import React,{useState, useEffect} from 'react';
 
-function ShoppingButtonProduct({product,increase,decrease,quantity}) {
+function ShoppingButtonProduct({product}) {
 
     const {_id,long_name, price, photo} = product
 
-    let [update, setUpdate] = useState(0);
+    const[quantity, setQuantity] = useState(0);
 
     useEffect(() => {
 
       const API = async () => {
-        setUpdate();
+        console.log("quantity");
+        console.log(quantity)
       }
       API();
       return () => {};
 
-  }, [update]);
+  }, [quantity]);
 
+  const decrease =  () => {
+    if(quantity===0) return
+    quantity--;
+    // setQuantity(quantity);
+    console.log("decrease");
+}
 
+const increase = () => {
+    quantity++;
+    // setQuantity(quantity);
+    console.log("increase");
+}
 
     return(
       <div className="flexContainer">
@@ -28,14 +40,14 @@ function ShoppingButtonProduct({product,increase,decrease,quantity}) {
         <div className="flexItem">
           <i
             className="fas fa-minus btn btn-azul"
-            onClick={() => decrease(_id)}
+            onClick={() => decrease()}
           ></i>
         </div>
-        <div className="flexItem">{update}</div>
+        <div className="flexItem">{quantity.value}</div>
         <div className="flexItem btn btn-azul">
         <i
             className="fas fa-plus"
-            onClick={() => increase(_id) }
+            onClick={() => increase() }
           ></i>
         </div>
         <div>
