@@ -5,22 +5,24 @@ function ShoppingButtonProduct({product}) {
     const {_id,long_name, price, photo} = product
 
     const[quantity, setQuantity] = useState(0);
+    const[update, setUpdate] = useState(false);
 
     useEffect(() => {
 
       const API = async () => {
         console.log("quantity");
         console.log(quantity)
+        setUpdate(!update)
       }
       API();
       return () => {};
 
-  }, [quantity]);
+  }, [quantity, update]);
 
   const decrease =  () => {
     if(quantity===0) return
     quantity--;
-    // setQuantity(quantity);
+   setQuantity(quantity);
     console.log("decrease");
 }
 
@@ -28,6 +30,13 @@ const increase = () => {
     quantity++;
     // setQuantity(quantity);
     console.log("increase");
+}
+
+const updateStete = () => {
+  setQuantity({
+      ...customer,
+      [e.target.name]: e.target.value
+  })
 }
 
     return(
