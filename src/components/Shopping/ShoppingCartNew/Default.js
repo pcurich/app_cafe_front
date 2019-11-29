@@ -28,7 +28,7 @@ function NewShpingCart(props) {
     const [categories, setCategories] = useState([]);
     const [search, setSearch] = useState('');
     const [products, saveProducts] = useState([]);
-    const [shoppingCart,setShoppingCart] = useState({id:uuid(),customer:{},details:[],total:{}});
+    const [shoppingCart,setShoppingCart] = useState({id:uuid(),customer:'',details:[],total:0});
     const [total, saveTotal] = useState(0);
 
     useEffect(() => {
@@ -46,10 +46,9 @@ function NewShpingCart(props) {
                 })
                 .then( bg=>{
                     setCategories(bg.data)
-                    localStorage.removeItem('cart');
-                    localStorage.setItem('cart', shoppingCart);
-                    console.log(localStorage.getItem('cart').customer)
-
+                    console.log("borar");
+                    // localStorage.removeItem('cart');
+                    localStorage.setItem('cart', JSON.stringify(shoppingCart));
                 });
             } catch (err) {
                 if(err.response.status === 500) {
@@ -59,48 +58,8 @@ function NewShpingCart(props) {
         }
         API();
         return () => {};
-        // if(products.length === 0) {
-        //     saveTotal(0);
-        //     return;
-        // }
 
-        // calcular el nuevo total
-        // let newTotal = 0;
-
-        // // recorrer todos los productos, sus cantidades y precios
-        // products.map(product => newTotal += (product.quantity * product.price)  );
-
-        // // almacenar el Total
-        // saveTotal(newTotal);
-
-    }, [id, customer, auth.auth, auth.token, props.history]);
-
-    const searchProduct  = async e => {
-        e.preventDefault();
-
-        // obtener los productos de la busqueda
-        const bg = await axios.post(`/products/search/${search}`);
-
-        // si no hay resultados una alerta, contrario agregarlo al state
-        if(bg.data[0]) {
-
-            let res = bg.data[0];
-            // agregar la llave "producto" (copia de id)
-            res.product = bg.data[0]._id;
-            res.quantity = 0;
-
-            // ponerlo en el state
-            saveProducts([...products, res]);
-
-        } else {
-            // no hay resultados
-            Swal.fire({
-                type: 'error',
-                title: 'No Resultados',
-                text: 'No hay resultados'
-            })
-        }
-    }
+    }, [id, auth.auth, auth.token, props.history, shoppingCart]);
 
     const searchCustomer = async e =>{
         e.preventDefault();
@@ -112,10 +71,14 @@ function NewShpingCart(props) {
 
         if(bg.data.length>0) {
             setCustomer(bg.data[0]);
-            shoppingCart.customer = bg.data[0];
-            setShoppingCart(shoppingCart);
-            localStorage.setItem('cart',shoppingCart)
-            console.log(localStorage.getItem('cart').customer)
+            // console.log(bg.data[0]);
+            var str = JSON.parse(localStorage.getItem('cart'));
+            str.customer = bg.data[0]._id;
+            // console.log("shoppingCart");
+            // console.log(str);
+            // localStorage.removeItem('cart');
+            localStorage.setItem('cart',JSON.stringify(str));
+            console.log(JSON.parse(localStorage.getItem('cart')))
         } else {
               // no hay resultados
             Swal.fire({
@@ -184,12 +147,6 @@ function NewShpingCart(props) {
             }
         }
         return 0;
-    }
-
-    // Elimina Un producto del state
-    const removeProduct = id => {
-        const all = products.filter(product => product.product !== id );
-        saveProducts(all)
     }
 
     const categorySelected = async categoryId =>{
@@ -294,6 +251,7 @@ function NewShpingCart(props) {
                             <ShoppingButtonProduct
                                 key={product._id}
                                 product={product}
+                                shoppingCartKey = {shoppingCart.id}
                                 // removeProduct={removeProduct}
                                 // index={index}
                             />
