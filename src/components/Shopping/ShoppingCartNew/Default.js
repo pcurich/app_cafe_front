@@ -105,45 +105,115 @@ function NewShpingCart(props) {
     const createShoppingCart = async e => {
         e.preventDefault();
 
-        products.forEach((p,i) =>{
-            if(p.quantity > 0) {
-                console.log(i)
-                console.log(p)
+        const headers = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`
+        }
+
+        const json = {
+            "user": localStorage.getItem("user"),
+            "total" : total,
+            customer: 
+        }
+
+        const steps = ['1', '2' ]
+        Swal.mixin({
+            confirmButtonText: 'Siguiente &rarr;',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            reverseButtons: true,
+            validationMessage: 'El valor es requerido',
+            progressSteps: steps
+        }).queue([
+            {
+                title: 'Medio de pago',
+                text: 'Seleccione el medio de pago',
+                input: 'select',
+                inputOptions: {
+                    Efectivo: 'Efectivo',
+                    Tarjeta: 'Tarjeta'
+                },
+                inputPlaceholder: 'Seleccione un método de pago',
+                inputAttributes: {
+                    required: true
+                }
+            },
+            {
+                title: 'Monto recibido',
+                text: 'Ingrese el monto recibido por el cliente',
+                input: 'number',
+                inputAttributes: {
+                    required: true,
+                    min:0.00,
+                    step:0.01
+                },
+            },
+        ]).then((result) => {
+            if (result.value) {
+                const result = await axios.post(`/shoppingcart/new/${id}`, json,{ headers: headers })
+                .then(res => {
+                    Swal.fire({
+                        title: 'Venta Guardada',
+                        html: `
+                            <p>Método selecionado <b>${result.value[0]}</b> </p> 
+                            <p>Monto Ingresado <b>S/ ${(new Number(result.value[1])).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                            <p>Total <b>S/ ${(new Number(total)).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                            <p>Vuelto <b>S/ ${(new Number(result.value[1]-total)).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                            <p>Vendedor <b>${localStorage.getItem("user")}</b></p>
+                            `,
+                        confirmButtonText: 'Imprimir'
+                    })
+                }).catch(err => {
+                    Swal.fire({
+                        type:'error',
+                        title:'Hubo un error',
+                        text:err
+                    })
+                });
+
+                
             }
         })
 
-        // extraer el ID
-        const { id } = props.match.params;
+        // products.forEach((p,i) =>{
+        //     if(p.quantity > 0) {
+        //         console.log(i)
+        //         console.log(p)
+        //     }
+        // })
 
-        // construir el objeto
-        const shoppingcart = {
-            "customer" : id,
-            "details" : products,
-            "total" : total
-        }
+        // // extraer el ID
+        // const { id } = props.match.params;
 
-        // almacenarlo en la BD
-        const result = await axios.post(`/shoppingcart/new/${id}`, shoppingcart);
+        // // construir el objeto
+        // const shoppingcart = {
+        //     "customer" : id,
+        //     "details" : products,
+        //     "total" : total
+        // }
 
-        // leer resultado
-        if(result.status === 200) {
-            // alerta de todo bien
-            Swal.fire({
-                type: 'success',
-                title: 'Correcto',
-                text: result.data.message
-            })
-        } else {
-            // alerta de error
-            Swal.fire({
-                type: 'error',
-                title: 'Hubo un Error',
-                text: 'Vuelva a intentarlo'
-            })
-        }
+        // // almacenarlo en la BD
+        // const result = await axios.post(`/shoppingcart/new/${id}`, shoppingcart);
 
-        // redireccionar
-        props.history.push('/shoppingCart');
+        // // leer resultado
+        // if(result.status === 200) {
+        //     // alerta de todo bien
+        //     Swal.fire({
+        //         type: 'success',
+        //         title: 'Correcto',
+        //         text: result.data.message
+        //     })
+        // } else {
+        //     // alerta de error
+        //     Swal.fire({
+        //         type: 'error',
+        //         title: 'Hubo un Error',
+        //         text: 'Vuelva a intentarlo'
+        //     })
+        // }
+
+        // // redireccionar
+        // props.history.push('/shoppingCart');
     }
 
     // Si el state esta como false
@@ -158,21 +228,38 @@ function NewShpingCart(props) {
 
     return (
         <Fragment>
-            <div className="ficha-cliente">
-                {
-                    customer._id?
-                        <CustomerSearchResult
-                            key = {customer._id}
-                            customer = {customer}
-                        ></CustomerSearchResult>
-                    :
-                        <CustomerSearch
-                            key = {customer._id}
-                            readSearchData = {readSearchData}
-                            searchCustomer = {searchCustomer}
-                        ></CustomerSearch>
-                }
+            <div className="ficha-total">
+                <div className="ficha-total-child-cliente">
+                    <div className="ficha-cliente">
+                        {
+                            customer._id?
+                                <CustomerSearchResult
+                                    key = {customer._id}
+                                    customer = {customer}
+                                ></CustomerSearchResult>
+                            :
+                                <CustomerSearch
+                                    key = {customer._id}
+                                    readSearchData = {readSearchData}
+                                    searchCustomer = {searchCustomer}
+                                ></CustomerSearch>
+                        }
+                    </div>
+                </div>
+                <div className="ficha-total-child-total">
+                    <p className="total"><span>S/. {total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</span> </p>
+                </div>
             </div>
+            
+            { total > 0 ? (
+                <form
+                    onSubmit={createShoppingCart}
+                >
+                    <input type="submit"
+                        className="btn btn-verde btn-block"
+                        value="Pagar" />
+                </form>
+            ) : null }
 
             <div className="grid contenedor contenido-principal">
                 <aside className="sidebar col-2">
@@ -199,18 +286,7 @@ function NewShpingCart(props) {
                         ))}
                     </ul>
                 </main>
-            </div>
-
-            <p className="total">Total a Pagar: <span>S/. {'S/' +  total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</span> </p>
-            { total > 0 ? (
-                <form
-                    onSubmit={createShoppingCart}
-                >
-                    <input type="submit"
-                        className="btn btn-verde btn-block"
-                        value="Realizar Pedido" />
-                </form>
-            ) : null }
+            </div> 
         </Fragment>
     )
 }

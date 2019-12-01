@@ -450,6 +450,23 @@ form .campo input[readonly] {
     padding: 4rem;
     width: 60rem;
 }
+.ficha-total{
+    display: flex;
+    align-items: center;
+}
+
+.ficha-total-child-cliente{
+    flex-grow: 2
+}
+
+.ficha-total-child-total{
+    flex-grow: 1
+}
+
+.ficha-total-child-total .total span{
+    font-weight: 900;
+    font-size: xx-large;
+}
 
 .ficha-cliente {
     background-color: var(--grisClaro);
