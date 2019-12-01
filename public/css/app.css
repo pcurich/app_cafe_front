@@ -470,7 +470,13 @@ h3.resumen-titulo {
 .total span {
     color: var(--azul);
 }
-
+.totalQuantity {
+    border: 0px;
+    width: 60px;
+    text-align: center;
+    background-color: #f3f3f3;
+    font-weight: 900;
+}
 .login {
     max-width: 520px;
     margin: 15rem  auto 0 auto;

@@ -7,10 +7,6 @@ import { withRouter } from 'react-router-dom';
 
 import { CRMContext } from '../../../context/CRMContext';
 
-import FormSearchProduct from './FormSearchProduct';
-import FormProduct from './FormProduct';
-
-
 import CustomerSearch from '../../Customer/CustomerSearch/Default'
 import CustomerSearchResult from '../../Customer/CustomerSearchResult/Default'
 
@@ -28,8 +24,8 @@ function NewShpingCart(props) {
     const [categories, setCategories] = useState([]);
     const [search, setSearch] = useState('');
     const [products, saveProducts] = useState([]);
-    const [shoppingCart,setShoppingCart] = useState({id:uuid(),customer:'',details:[],total:0});
-    const [total, saveTotal] = useState(0);
+    const [shoppingCart, ] = useState({id:uuid(),customer:'',details:[],total:0});
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
 
@@ -46,8 +42,6 @@ function NewShpingCart(props) {
                 })
                 .then( bg=>{
                     setCategories(bg.data)
-                    console.log("borar");
-                    // localStorage.removeItem('cart');
                     localStorage.setItem('cart', JSON.stringify(shoppingCart));
                 });
             } catch (err) {
@@ -63,6 +57,11 @@ function NewShpingCart(props) {
 
     const searchCustomer = async e =>{
         e.preventDefault();
+
+        if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+            return props.history.push('/login')
+        };
+
         const bg = await axios.post(`/customers/search/${search}`,'',{
             headers: {
                 Authorization : `Bearer ${auth.token}`
@@ -71,16 +70,10 @@ function NewShpingCart(props) {
 
         if(bg.data.length>0) {
             setCustomer(bg.data[0]);
-            // console.log(bg.data[0]);
             var str = JSON.parse(localStorage.getItem('cart'));
             str.customer = bg.data[0]._id;
-            // console.log("shoppingCart");
-            // console.log(str);
-            // localStorage.removeItem('cart');
             localStorage.setItem('cart',JSON.stringify(str));
-            console.log(JSON.parse(localStorage.getItem('cart')))
         } else {
-              // no hay resultados
             Swal.fire({
                 type: 'error',
                 title: 'No Resultados',
@@ -93,63 +86,12 @@ function NewShpingCart(props) {
         setSearch( e.target.value );
     }
 
-    // actualizar la cantidad de productos
-    const decrease = id => {
-        var e = false;
-        for(let i = 0 ; i< shoppingCart.details.length; i++){
-            if(shoppingCart.details[i].product===id){
-                e=true;
-                if(shoppingCart.details[i].quantity!==0){
-                    shoppingCart.details[i].quantity--;
-                }
-            }
-        }
-
-        if(!e){
-            for (let i = 0; i < products.length; i++) {
-                if(id === products[i]._id){
-                    var data = { product: products[i]._id,quantity:0}
-                    shoppingCart.details.push(data);
-                    break;
-                }
-            }
-        }
-        quantity(id)
-    }
-
-    const increase = id => {
-        var e = false;
-        for(let i = 0 ; i< shoppingCart.details.length; i++){
-            if(shoppingCart.details[i].product===id){
-                e=true;
-                if(shoppingCart.details[i].quantity!==0){
-                    shoppingCart.details[i].quantity++;
-                }
-            }
-        }
-
-        if(!e){
-            for (let i = 0; i < products.length; i++) {
-                if(id === products[i]._id){
-                    var data = { product: products[i]._id,quantity:1}
-                    shoppingCart.details.push(data);
-                    break;
-                }
-            }
-        }
-        quantity(id)
-    }
-
-    const quantity = id => {
-        for(let i = 0 ; i< shoppingCart.details.length; i++){
-            if(shoppingCart.details[i].product===id){
-                return shoppingCart.details[i].quantity
-            }
-        }
-        return 0;
-    }
-
     const categorySelected = async categoryId =>{
+
+        if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+            return props.history.push('/login')
+        };
+
         await axios.get(`/product-by-category/${categoryId}`,{
             headers: {
                 Authorization : `Bearer ${auth.token}`
@@ -157,7 +99,6 @@ function NewShpingCart(props) {
         })
         .then(bg=>{
             saveProducts(bg.data);
-            console.log(products);
         });
     }
 
@@ -180,7 +121,6 @@ function NewShpingCart(props) {
             "details" : products,
             "total" : total
         }
-        console.log(shoppingcart);
 
         // almacenarlo en la BD
         const result = await axios.post(`/shoppingcart/new/${id}`, shoppingcart);
@@ -211,6 +151,11 @@ function NewShpingCart(props) {
         return props.history.push('/login')
     };
 
+    const updateTotal = (e) => {
+        var shoppingCart = JSON.parse(localStorage.getItem('cart'));
+        setTotal(shoppingCart.total)
+    }
+
     return (
         <Fragment>
             <div className="ficha-cliente">
@@ -226,9 +171,7 @@ function NewShpingCart(props) {
                             readSearchData = {readSearchData}
                             searchCustomer = {searchCustomer}
                         ></CustomerSearch>
-
                 }
-
             </div>
 
             <div className="grid contenedor contenido-principal">
@@ -239,8 +182,7 @@ function NewShpingCart(props) {
                         key={category._id}
                         category={category}
                         categorySelected = {()=>categorySelected(category._id)}
-                        />
-
+                    />
                     ))
                 }
                 </aside>
@@ -252,16 +194,14 @@ function NewShpingCart(props) {
                                 key={product._id}
                                 product={product}
                                 shoppingCartKey = {shoppingCart.id}
-                                // removeProduct={removeProduct}
-                                // index={index}
+                                updateTotal= {updateTotal}
                             />
                         ))}
-
                     </ul>
                 </main>
             </div>
 
-            <p className="total">Total a Pagar: <span>S/. {total}</span> </p>
+            <p className="total">Total a Pagar: <span>S/. {'S/' +  total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</span> </p>
             { total > 0 ? (
                 <form
                     onSubmit={createShoppingCart}

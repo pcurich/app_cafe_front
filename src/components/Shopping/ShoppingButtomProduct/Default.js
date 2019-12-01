@@ -1,6 +1,6 @@
 import React,{useState, useEffect} from 'react';
 
-function ShoppingButtonProduct({product,shoppingCartKey}) {
+function ShoppingButtonProduct({product,shoppingCartKey,updateTotal}) {
 
     const {_id,long_name, price, photo} = product
 
@@ -49,7 +49,7 @@ const saveProduct = ()=>{
         }
       });
     }else{
-      shoppingCart.details.push({productId:_id,quantity:quantity.value});
+      shoppingCart.details.push({productId:_id,price: price,quantity:quantity.value});
     }
     if(quantity.value === 0){
       shoppingCart.details.forEach((e ,i)=> {
@@ -58,7 +58,17 @@ const saveProduct = ()=>{
         }
       });
     }
+
+    var total = 0.0;
+    shoppingCart.details.forEach((e ,i)=> {
+      total = (e.price * e.quantity) + total
+    });
+
+    shoppingCart.total = total;
+
     localStorage.setItem('cart', JSON.stringify(shoppingCart));
+
+    updateTotal();
   }
 }
 
@@ -75,26 +85,21 @@ const saveProduct = ()=>{
           <img style={{"verticalAlign":"middle"}} src={`${process.env.REACT_APP_BACKEND_URL}/${photo}`} alt="imagen" width="60" height="60" />
         </div>
         <div className="flexItem">{long_name}</div>
-        <div className="flexItem">{'S/' +  price.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')} </div>
+        <div className="flexItem">
+          {'S/' +  price.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}
+        </div>
         <div className="flexItem">
           <button type="button" className="btn btn-azul" onClick={() => decrease()}>
             <i className="fas fa-minus"></i>
           </button>
         </div>
-        <div className="flexItem">{quantity.value}</div>
+        <div className="flexItem">
+          <input type="number"  value={quantity.value} onChange={updateTotal} className="totalQuantity" />
+        </div>
         <div className="flexItem">
           <button type="button" className="btn btn-azul" onClick={() => increase() }>
             <i className="fas fa-plus"></i>
           </button>
-        </div>
-        <div>
-        <button
-          type="button"
-          className="btn btn-rojo"
-          // onClick={() => eliminarProductoPedido(producto._id)}
-        >
-        <i className="fas fa-minus-circle"></i>
-        </button>
         </div>
       </div>
     )
