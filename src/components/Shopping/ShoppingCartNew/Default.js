@@ -112,8 +112,9 @@ function NewShpingCart(props) {
 
         const json = {
             "user": localStorage.getItem("user"),
-            "total" : total,
-            customer: 
+            "customer": JSON.parse(localStorage.getItem("cart")).customer,
+            "details" :  JSON.parse(localStorage.getItem("cart")).details,
+            "total" :  JSON.parse(localStorage.getItem("cart")).total
         }
 
         const steps = ['1', '2' ]
@@ -150,15 +151,18 @@ function NewShpingCart(props) {
             },
         ]).then((result) => {
             if (result.value) {
-                const result = await axios.post(`/shoppingcart/new/${id}`, json,{ headers: headers })
+
+                console.log(json);
+
+                axios.post(`/shoppingcart/new/${id}`, json,{ headers: headers })
                 .then(res => {
                     Swal.fire({
                         title: 'Venta Guardada',
                         html: `
-                            <p>Método selecionado <b>${result.value[0]}</b> </p> 
-                            <p>Monto Ingresado <b>S/ ${(new Number(result.value[1])).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
-                            <p>Total <b>S/ ${(new Number(total)).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
-                            <p>Vuelto <b>S/ ${(new Number(result.value[1]-total)).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                            <p>Método selecionado <b>${result.value[0]}</b> </p>
+                            <p>Monto Ingresado <b>S/ ${((result.value[1])*1).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                            <p>Total <b>S/ ${((total*1)).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                            <p>Vuelto <b>S/ ${((result.value[1]-total)*1).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
                             <p>Vendedor <b>${localStorage.getItem("user")}</b></p>
                             `,
                         confirmButtonText: 'Imprimir'
@@ -171,7 +175,7 @@ function NewShpingCart(props) {
                     })
                 });
 
-                
+
             }
         })
 
@@ -250,7 +254,7 @@ function NewShpingCart(props) {
                     <p className="total"><span>S/. {total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</span> </p>
                 </div>
             </div>
-            
+
             { total > 0 ? (
                 <form
                     onSubmit={createShoppingCart}
@@ -286,7 +290,7 @@ function NewShpingCart(props) {
                         ))}
                     </ul>
                 </main>
-            </div> 
+            </div>
         </Fragment>
     )
 }
