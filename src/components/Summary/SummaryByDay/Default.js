@@ -9,7 +9,7 @@ function SummaryByDay(props) {
                     <input
                         type="date"
                         name="fecha"
-                        onChange={props.readSearchData}
+                        onChange={props.readDateData}
                     />
                 <input
                     type="submit"

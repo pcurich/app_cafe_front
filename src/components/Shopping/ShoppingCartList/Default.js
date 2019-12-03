@@ -1,12 +1,16 @@
-import React, {useEffect, useState, Fragment} from 'react';
+import React, {useEffect, useState,useContext, Fragment} from 'react';
 import axios from '../../../config/axios';
 import ShoppingCardOrder from '../ShoppingCardOrder/Default';
 import SummaryByDay from '../../Summary/SummaryByDay/Default';
+import { CRMContext } from '../../../context/CRMContext';
 
 function ShoppingCard() {
 
-    const [ordens, save] = useState([]);
+    const [auth ] = useContext( CRMContext );
 
+    const [shoppingCarts, setShoppingCarts] = useState([]);
+    const [date, setDate] = useState( new Date());
+    
     useEffect(() => {
         const API = async () => {
             // obtener los pedidos
@@ -18,14 +22,35 @@ function ShoppingCard() {
         API();
     }, []);
 
+    const readDateData = e => {
+        setDate( e.target.value );
+    }
+
+    const searchDay = async e => {
+        e.preventDefault();
+        setShoppingCarts([[]]);
+
+        await axios.get(`/shoppingcart/${date}/${localStorage.getItem('user')}`,{
+            headers: {
+                Authorization : `Bearer ${auth.token}`
+            }
+        }).then(res => {
+            console.log(res.data);
+        });
+
+    }
+
     return (
         <Fragment>
             <h2>Ventas</h2>
             <div className="ficha-cliente">
-                <SummaryByDay></SummaryByDay>
+                <SummaryByDay
+                    searchDay = {searchDay}
+                    readDateData = {readDateData}
+                ></SummaryByDay>
             </div>
             <ul className="listado-pedidos">
-                {ordens.map(order => (
+                {shoppingCarts.map(order => (
                     <ShoppingCardOrder
                         key={order._id}
                         order={order}
