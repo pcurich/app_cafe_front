@@ -1,6 +1,7 @@
 import React, {useEffect, useState, Fragment} from 'react';
 import axios from '../../../config/axios';
 import ShoppingCardOrder from '../ShoppingCardOrder/Default';
+import SummaryByDay from '../../Summary/SummaryByDay/Default';
 
 function ShoppingCard() {
 
@@ -19,8 +20,10 @@ function ShoppingCard() {
 
     return (
         <Fragment>
-            <h2>Pedidos</h2>
-
+            <h2>Ventas</h2>
+            <div className="ficha-cliente">
+                <SummaryByDay></SummaryByDay>
+            </div>
             <ul className="listado-pedidos">
                 {ordens.map(order => (
                     <ShoppingCardOrder

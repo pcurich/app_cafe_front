@@ -14,8 +14,7 @@ const Header = (props) => {
             auth: false
         });
 
-        localStorage.setItem('token', '');
-        localStorage.setItem('user', '');
+        localStorage.clear();
 
         // redireccionar
         props.history.push('/login');

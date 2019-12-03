@@ -20,6 +20,8 @@ import NewProduct from './components/Product/ProductCreateUpdate/Default'
 import ShoppingCarts from './components/Shopping/ShoppingCartList/Default'
 import NewShoppingCart from './components/Shopping/ShoppingCartNew/Default'
 
+import SummaryByDay from './components/Summary/SummaryByDay/Default'
+
 import { CRMContext, CRMProvider } from './context/CRMContext';
 
 import Login from './components/Auth/Login/Default'
@@ -57,7 +59,7 @@ function App(){
               <Route exact path="/product/new" component={NewProduct} />
               <Route exact path="/product/edit/:id" component={NewProduct} />
 
-              <Route exact path="/shoppingCart" component={ShoppingCarts} />
+              <Route exact path="/shoppingCarts" component={ShoppingCarts} />
               <Route exact path="/shoppingCart/new" component={NewShoppingCart} />
               <Route exact path="/shoppingCart/new/:id" component={NewShoppingCart} />
 

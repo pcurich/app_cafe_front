@@ -204,12 +204,17 @@ h2 {
 .navegacion a.pedidos::before {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
-    content: "\f02d";
+    content: "\f217";
 }
 .navegacion a.categorias::before {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     content: "\f0ce";
+}
+.navegacion a.reporte::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f02d";
 }
 
 

@@ -110,13 +110,6 @@ function NewShpingCart(props) {
             Authorization: `Bearer ${auth.token}`
         }
 
-        const json = {
-            "user": localStorage.getItem("user"),
-            "customer": JSON.parse(localStorage.getItem("cart")).customer,
-            "details" :  JSON.parse(localStorage.getItem("cart")).details,
-            "total" :  JSON.parse(localStorage.getItem("cart")).total
-        }
-
         const steps = ['1', '2' ]
         Swal.mixin({
             confirmButtonText: 'Siguiente &rarr;',
@@ -150,23 +143,45 @@ function NewShpingCart(props) {
                 },
             },
         ]).then((result) => {
-            if (result.value) {
+            if (result.value) { 
+                
+                console.log(result.value);
 
-                console.log(json);
+                const cart = JSON.parse(localStorage.getItem("cart"));
+
+                const json = {
+                    "id"            : cart.id,
+                    "user"          : localStorage.getItem("user"),
+                    "customer"      : cart.customer,
+                    "details"       : cart.details,
+                    "paymentType"   : (result.value[0] === "Efectivo"? 'Cash':'Credit'),
+                    "cash"          : (result.value[0] === "Efectivo"? result.value[1]: 0),
+                    "credit"        : (result.value[0] === "Tarjeta"? result.value[1]: 0),
+                    "change"        : (cart.total*1.0 - result.value[1]*1.0).toFixed(2),
+                    "total"         : cart.total
+                }
 
                 axios.post(`/shoppingcart/new/${id}`, json,{ headers: headers })
                 .then(res => {
-                    Swal.fire({
-                        title: 'Venta Guardada',
-                        html: `
-                            <p>Método selecionado <b>${result.value[0]}</b> </p>
-                            <p>Monto Ingresado <b>S/ ${((result.value[1])*1).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
-                            <p>Total <b>S/ ${((total*1)).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
-                            <p>Vuelto <b>S/ ${((result.value[1]-total)*1).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
-                            <p>Vendedor <b>${localStorage.getItem("user")}</b></p>
-                            `,
-                        confirmButtonText: 'Imprimir'
-                    })
+                    console.log("res.data.cart");
+                    console.log(res.data.cart);
+                    if(res.status === 200){
+
+                        localStorage.removeItem("cart");
+
+                        Swal.fire({
+                            title: res.data.message,
+                            html: `
+                                <p>Método selecionado <b>${result.value[0]}</b> </p>
+                                <p>Monto Ingresado <b>S/ ${((result.value[1])*1).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                                <p>Total <b>S/ ${((total*1)).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                                <p>Vuelto <b>S/ ${((result.value[1]-total)*1).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')}</b> </p>
+                                <p>Vendedor <b>${localStorage.getItem("user")}</b></p>
+                                `,
+                            confirmButtonText: 'Imprimir'
+                        })
+                    }
+                    props.history.push('/SummaryByDay');
                 }).catch(err => {
                     Swal.fire({
                         type:'error',
@@ -174,50 +189,8 @@ function NewShpingCart(props) {
                         text:err
                     })
                 });
-
-
             }
-        })
-
-        // products.forEach((p,i) =>{
-        //     if(p.quantity > 0) {
-        //         console.log(i)
-        //         console.log(p)
-        //     }
-        // })
-
-        // // extraer el ID
-        // const { id } = props.match.params;
-
-        // // construir el objeto
-        // const shoppingcart = {
-        //     "customer" : id,
-        //     "details" : products,
-        //     "total" : total
-        // }
-
-        // // almacenarlo en la BD
-        // const result = await axios.post(`/shoppingcart/new/${id}`, shoppingcart);
-
-        // // leer resultado
-        // if(result.status === 200) {
-        //     // alerta de todo bien
-        //     Swal.fire({
-        //         type: 'success',
-        //         title: 'Correcto',
-        //         text: result.data.message
-        //     })
-        // } else {
-        //     // alerta de error
-        //     Swal.fire({
-        //         type: 'error',
-        //         title: 'Hubo un Error',
-        //         text: 'Vuelva a intentarlo'
-        //     })
-        // }
-
-        // // redireccionar
-        // props.history.push('/shoppingCart');
+        }) 
     }
 
     // Si el state esta como false
@@ -229,6 +202,10 @@ function NewShpingCart(props) {
         var shoppingCart = JSON.parse(localStorage.getItem('cart'));
         setTotal(shoppingCart.total)
     }
+
+    if(!auth.auth && (localStorage.getItem('token')===auth.token)) {
+        return props.history.push('/login')
+    };
 
     return (
         <Fragment>
@@ -255,15 +232,11 @@ function NewShpingCart(props) {
                 </div>
             </div>
 
-            { total > 0 ? (
-                <form
-                    onSubmit={createShoppingCart}
-                >
-                    <input type="submit"
-                        className="btn btn-verde btn-block"
-                        value="Pagar" />
-                </form>
-            ) : null }
+            <form onSubmit={createShoppingCart} >
+                <input type="submit" className="btn btn-verde btn-block" disabled={total===0} value="Pagar" />
+            </form>
+
+            
 
             <div className="grid contenedor contenido-principal">
                 <aside className="sidebar col-2">
