@@ -8,8 +8,10 @@ function ShoppingCardOrder({order}) {
     return(
         <li className="pedido">
             <div className="info-pedido">
-                <p className="id">ID: 0192019201291201</p>
-                <p className="nombre">Cliente: {customer.name} {customer.last_name} </p>
+                <p className="id">{order._id}</p>
+                <p className="nombre">
+                    {order.customer ? order.customer.name + ' ' + order.customer.last_name : null }
+                </p>
 
                 <div className="articulos-pedido">
                     <p className="productos">Artículos Pedido: </p>
