@@ -10,14 +10,34 @@ function ShoppingCard() {
 
     const [shoppingCarts, setShoppingCarts] = useState([]);
     const [date, setDate] = useState( new Date());
-    
+
     useEffect(() => {
         const API = async () => {
             // obtener los pedidos
-            const bg = await axios.get('/shoppingcart');
-            if(!bg.data){
-                save(bg.data);
-            };
+            const headers = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${auth.token}`
+            }
+
+            let formData = new FormData();
+            formData.append('year',date.getFullYear());
+            formData.append('month',date.getMonth()+1);
+            formData.append('day',date.getDate());
+
+            var object = {};
+            formData.forEach(function(value, key){
+                object[key] = value;
+            });
+            var json = JSON.stringify(object);
+
+            console.log(date);
+
+            await axios.post(`/shoppingcart/${localStorage.getItem('user')}`,
+                    json, { headers: headers })
+                .then(res => {
+                console.log(res.data);
+                setShoppingCarts(res.data);
+            });
         }
         API();
     }, []);
@@ -30,11 +50,28 @@ function ShoppingCard() {
         e.preventDefault();
         setShoppingCarts([[]]);
 
-        await axios.get(`/shoppingcart/${date}/${localStorage.getItem('user')}`,{
-            headers: {
-                Authorization : `Bearer ${auth.token}`
-            }
-        }).then(res => {
+        const headers = {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`
+        }
+
+        let formData = new FormData();
+        formData.append('year',date.getFullYear());
+        formData.append('month',date.getMonth()+1);
+        formData.append('day',date.getDate());
+
+        var object = {};
+        formData.forEach(function(value, key){
+            object[key] = value;
+        });
+        var json = JSON.stringify(object);
+
+        console.log(date);
+
+        await axios.post(`/shoppingcart/${localStorage.getItem('user')}`,
+                json,
+                { headers: headers })
+            .then(res => {
             console.log(res.data);
         });
 
