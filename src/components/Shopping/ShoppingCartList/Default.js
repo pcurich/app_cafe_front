@@ -3,6 +3,7 @@ import axios from '../../../config/axios';
 import ShoppingCardOrder from '../ShoppingCardOrder/Default';
 import SummaryByDay from '../../Summary/SummaryByDay/Default';
 import { CRMContext } from '../../../context/CRMContext';
+import moment from "moment"
 
 function ShoppingCard() {
 
@@ -10,6 +11,8 @@ function ShoppingCard() {
 
     const [shoppingCarts, setShoppingCarts] = useState([]);
     const [date, setDate] = useState( new Date());
+    const [totalCash, setTotalCash] = useState(0);
+    const [totalCredit, setTotalCredit] = useState(0);
 
     useEffect(() => {
         const API = async () => {
@@ -28,22 +31,32 @@ function ShoppingCard() {
             formData.forEach(function(value, key){
                 object[key] = value;
             });
-            var json = JSON.stringify(object);
-
-            console.log(date);
+            var json = JSON.stringify(object); 
 
             await axios.post(`/shoppingcart/${localStorage.getItem('user')}`,
                     json, { headers: headers })
                 .then(res => {
-                console.log(res.data);
+                    
+                    setTotalCash(0);
+                    setTotalCredit(0);
+
+                    res.data.forEach(e=>{
+                        if(e.paymentType === 'Cash'){
+                            console.log(totalCash + e.cash);
+                            setTotalCash(totalCash + e.cash);
+                        }else{
+                            console.log(totalCredit + e.credit);
+                            setTotalCredit(totalCredit+ e.credit);
+                        }
+                    })
                 setShoppingCarts(res.data);
             });
         }
         API();
-    }, []);
+    }, [auth.token, date]);
 
     const readDateData = e => {
-        setDate( e.target.value );
+        setDate(moment.utc(e.target.value).add(5, 'hours').toDate());
     }
 
     const searchDay = async e => {
@@ -66,13 +79,24 @@ function ShoppingCard() {
         });
         var json = JSON.stringify(object);
 
-        console.log(date);
-
         await axios.post(`/shoppingcart/${localStorage.getItem('user')}`,
                 json,
                 { headers: headers })
             .then(res => {
-            console.log(res.data);
+                
+                setTotalCash(0);
+                setTotalCredit(0);
+
+                res.data.forEach(e=>{
+                    if(e.paymentType === 'Cash'){
+                        console.log(totalCash + e.cash);
+                        setTotalCash(...totalCash,totalCash + e.cash);
+                    }else{
+                        console.log(totalCredit + e.credit);
+                        setTotalCredit(...totalCredit,totalCredit+ e.credit);
+                    }
+                })
+                // setShoppingCarts(res.data); 
         });
 
     }
@@ -83,9 +107,11 @@ function ShoppingCard() {
             <div className="ficha-cliente">
                 <SummaryByDay
                     searchDay = {searchDay}
-                    readDateData = {readDateData}
+                    readDateData = {readDateData} 
                 ></SummaryByDay>
             </div>
+            <p>Total Efectivo S/ {totalCash.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')} | Total Tarjeta S/ {totalCredit.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, 'S/1,')} </p>
+
             <ul className="listado-pedidos">
                 {shoppingCarts.map(order => (
                     <ShoppingCardOrder
@@ -94,6 +120,7 @@ function ShoppingCard() {
                     />
                 ))}
             </ul>
+            
         </Fragment>
     )
 }

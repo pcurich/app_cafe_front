@@ -1,5 +1,6 @@
 import React,{Fragment} from 'react';
 
+
 function SummaryByDay(props) {
     return(
         <Fragment>
@@ -9,7 +10,8 @@ function SummaryByDay(props) {
                     <input
                         type="date"
                         name="fecha"
-                        onChange={props.readDateData}
+                        onChange={props.readDateData} 
+                        value = {props.value}
                     />
                 <input
                     type="submit"
